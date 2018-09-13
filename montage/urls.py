@@ -8,6 +8,7 @@ from django.conf.urls.static import static
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     # url(r'^', include('accounts.urls', namespace='accounts')),
+    # url(r'^graphql/', GraphQLView.as_view(graphiql=True)),
 ]
 
 # urlpatterns += static(MEDIA_URL, document_root=MEDIA_ROOT)

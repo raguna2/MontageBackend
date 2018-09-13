@@ -5,3 +5,4 @@ django-toolbelt
 whitenoise
 django-filter
 django-extensions
+graphene_django
