@@ -85,5 +85,7 @@ DATABASES = {
 - コンテナ作り直し ```docker-compose down```
 - コンテナ作成 ```docker-compose build``` (docker-compose.ymlのあるディレクトリで)
 - コンテナ起動```docker-compose up -d``` (docker-compose.ymlのあるディレクトリで)
+- エラーログ確認```docker-compose logs web``` (docker-compose.ymlのあるディレクトリで)
+
 
 
