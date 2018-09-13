@@ -1,0 +1,5 @@
+Django==2.0
+psycopg2
+django-debug-toolbar
+django-toolbelt
+whitenoise

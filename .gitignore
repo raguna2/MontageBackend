@@ -1,0 +1,25 @@
+/montage/settings/settings_secret.py
+
+# Python bytecode:
+*.py[co]
+__pycache__
+
+# Packaging files:
+*.egg*
+
+# Editor temp files:
+*.swp
+*~
+
+# Sphinx docs:
+build
+
+# Celerybeat scheduler file:
+celerybeat-schedule
+
+django.log
+/migrations/*
+
+/media/user-icon/*
+.DS_Store
+
