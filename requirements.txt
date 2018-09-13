@@ -3,3 +3,5 @@ psycopg2
 django-debug-toolbar
 django-toolbelt
 whitenoise
+django-filter
+django-extensions
