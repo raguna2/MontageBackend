@@ -69,38 +69,35 @@ DATABASES = {
 # DATABASE ------------------------------------------
 
 # DEBUG_TOOLBAR_SETTINGS
-# DEBUG_TOOLBAR_PATCH_SETTINGS = False
-# if DEBUG:
-#     INTERNAL_IPS = ('172.17.0.1', 'localhost',)
-#     MIDDLEWARE += (
-#         'debug_toolbar.middleware.DebugToolbarMiddleware',
-#     )
-#     # MIDDLEWARE_CLASSES =[
-#     #     'debug_toolbar.middleware.DebugToolbarMiddleware',
-#     # ]
-#     INSTALLED_APPS += (
-#         'debug_toolbar',
-#     )
-#     DEBUG_TOOLBAR_PANELS = [
-#         'debug_toolbar.panels.versions.VersionsPanel',
-#         'debug_toolbar.panels.timer.TimerPanel',
-#         'debug_toolbar.panels.settings.SettingsPanel',
-#         'debug_toolbar.panels.headers.HeadersPanel',
-#         'debug_toolbar.panels.request.RequestPanel',
-#         'debug_toolbar.panels.sql.SQLPanel',
-#         'debug_toolbar.panels.staticfiles.StaticFilesPanel',
-#         'debug_toolbar.panels.templates.TemplatesPanel',
-#         'debug_toolbar.panels.cache.CachePanel',
-#         'debug_toolbar.panels.signals.SignalsPanel',
-#         'debug_toolbar.panels.logging.LoggingPanel',
-#         'debug_toolbar.panels.redirects.RedirectsPanel',
-#     ]
-#     DEBUG_TOOLBAR_CONFIG = {
-#         'INTERCEPT_REDIRECTS': False,
-#     }
-# else:
-#     # Honor the 'X-Forwarded-Proto' header for request.is_secure()
-#     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+DEBUG_TOOLBAR_PATCH_SETTINGS = False
+if DEBUG:
+    INTERNAL_IPS = ('172.17.0.1', 'localhost',)
+    MIDDLEWARE += (
+        'debug_toolbar.middleware.DebugToolbarMiddleware',
+    )
+    INSTALLED_APPS += (
+        'debug_toolbar',
+    )
+    DEBUG_TOOLBAR_PANELS = [
+        'debug_toolbar.panels.versions.VersionsPanel',
+        'debug_toolbar.panels.timer.TimerPanel',
+        'debug_toolbar.panels.settings.SettingsPanel',
+        'debug_toolbar.panels.headers.HeadersPanel',
+        'debug_toolbar.panels.request.RequestPanel',
+        'debug_toolbar.panels.sql.SQLPanel',
+        'debug_toolbar.panels.staticfiles.StaticFilesPanel',
+        'debug_toolbar.panels.templates.TemplatesPanel',
+        'debug_toolbar.panels.cache.CachePanel',
+        'debug_toolbar.panels.signals.SignalsPanel',
+        'debug_toolbar.panels.logging.LoggingPanel',
+        'debug_toolbar.panels.redirects.RedirectsPanel',
+    ]
+    DEBUG_TOOLBAR_CONFIG = {
+        'INTERCEPT_REDIRECTS': False,
+    }
+else:
+    # Honor the 'X-Forwarded-Proto' header for request.is_secure()
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 # DEBUG_TOOLBAR_SETTINGS --------------------------------------
 
 AUTH_PASSWORD_VALIDATORS = [
