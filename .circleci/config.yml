@@ -3,6 +3,9 @@ jobs:
   build:
     docker:
       - image: circleci/python:3.7
+    branches:
+        only:
+          - staging
     steps:
       - checkout
       - run:
