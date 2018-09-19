@@ -1,0 +1,23 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/python:3.7
+    branches:
+        only:
+          - staging
+    steps:
+      - checkout
+      - run:
+          name: install dependencies
+          command: |
+            python3 -m venv venv
+            ./venv/bin/pip install -U pip
+            ./venv/bin/pip install -U setuptools
+            ./venv/bin/pip install -U tox
+            ./venv/bin/tox --notest
+      # run tests!
+      - run:
+          name: run tests
+          command: |
+            ./venv/bin/tox
