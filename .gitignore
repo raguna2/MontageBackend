@@ -22,13 +22,9 @@ django.log
 /media/user-icon/*
 .DS_Store
 
-.mypy_chache/*
-*/.mypy_chache/*
+.mypy_cache/
 
 # testing
 .coverage
-.pytest_cache/*
-.tox/*
-
-
-# 
+.pytest_cache/
+.tox/
