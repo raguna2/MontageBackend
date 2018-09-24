@@ -18,9 +18,17 @@ build
 celerybeat-schedule
 
 django.log
-/migrations/*
 
 /media/user-icon/*
 .DS_Store
 
-.mypy_chache/
+.mypy_chache/*
+*/.mypy_chache/*
+
+# testing
+.coverage
+.pytest_cache/*
+.tox/*
+
+
+# 
