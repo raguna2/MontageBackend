@@ -11,3 +11,4 @@ COPY requirements.txt /app/
 RUN pip install -r requirements.txt
 # ローカルのDockerfileを設置したディレクトリ内のファイルをコンテナの/appディレクトリへコピー
 COPY . /app/
+CMD python manage.py runserver 0.0.0.0:$PORT
