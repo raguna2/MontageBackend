@@ -1,3 +1,12 @@
 from django.contrib import admin
+from .models import Category
 
-# Register your models here.
+
+class CategoryInline(admin.StackedInline):
+    model = Category
+
+
+@admin.register(Category)
+class CategoryAdmin(admin.ModelAdmin):
+    fields = ['name', 'description']
+    list_display = ('id', 'name', 'description')
