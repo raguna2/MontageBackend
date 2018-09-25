@@ -6,41 +6,39 @@ from categories.models import Category
 
 class ImpressionQuerySet(models.query.QuerySet):
     def presonalized(self):
+        """
+        個人のページで作成された質問だけに絞る
+        """
         return self.filter(is_personal=True)
 
     def masters(self):
+        """
+        運営が作成した質問だけに絞る
+        """
         return self.filter(is_personal=False)
 
 
-class ImpressionManager(models.Manager):
-    def get_query_set(self):
-        return ImpressionQuerySet(self.model)
-
-    def __getattr__(self, name):
-        return getattr(self.get_query_set(), name)
-
-
 class Impression(models.Model):
-    objects = ImpressionManager()
+    objects = ImpressionQuerySet().as_manager()
 
     class Meta:
         verbose_name = 'Impression'
         verbose_name_plural = 'Impressions'
         ordering = ('-updated_at',)
 
-    user = models.ManyToManyField('ユーザ', AUTH_USER_MODEL, related_name='user')
-    about = models.CharField(
-        '質問項目',
-        max_length=42,
-        help_text='何のプロフィールについて?',
-        validators=[validators.MinLengthValidator(5)],
-        error_messages={
-            'min': "質問は5文字以上で行ってください",
-        },
+    # 逆参照時: MontageUser.rev_impression.all()
+    user = models.ManyToManyField(AUTH_USER_MODEL, related_name='rev_impression')
+    about = models.CharField(max_length=42,)
+    # 逆参照時: Category.rev_impression.all()
+    # カテゴリが削除されてもImpressionは残す
+    category = models.ForeignKey(
+        Category,
+        related_name='rev_impression',
+        blank=True, null=True, default=None,
+        on_delete=models.SET_NULL
     )
-    category = models.ForeignKey('aboutのカテゴリ', Category, related_name='category')
-    appeared_at = models.DateTimeField('生成日時', auto_now_add=True)
-    updated_at = models.DateTimeField('更新日', auto_now=True)
+    appeared_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     is_personal = models.BooleanField(
         '個人的なものか',
         help_text="""
@@ -56,11 +54,13 @@ class Impression(models.Model):
 
     @property
     def display_about(self):
-        return f'@{self.about}'
+        """画面に表示するときはQ:をつける"""
+        return f'Q: {self.about}'
 
 
 class HearsayQuerySet(models.query.QuerySet):
     def not_collaged(self):
+        """collageされていないものを抽出"""
         return self.filter(is_collaged=False)
 
 
@@ -78,10 +78,13 @@ class Hearsay(models.Model):
         verbose_name_plural = 'Hearsays'
         ordering = ('-posted_at',)
 
+    # 逆参照時: Impression.rev_hearsay.all()
+    # Impressionがなくなったとき、画面には表示しなくなるがデータは残す
     impression = models.ForeignKey(
-        'impressionに対するうわさ',
         Impression,
-        related_name='hearsay'
+        related_name='rev_hearsay',
+        blank=True, null=True, default=None,
+        on_delete=models.SET_NULL
     )
     content = models.CharField(
         'うわさ',

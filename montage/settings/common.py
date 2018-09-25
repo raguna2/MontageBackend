@@ -72,6 +72,8 @@ CONTRIB_APPS = [
 ]
 PROJECT_APPS = [
     'accounts',
+    'categories',
+    'portraits'
 ]
 EXTERNAL_APPS = [
     'graphene_django',
