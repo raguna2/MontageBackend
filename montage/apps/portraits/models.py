@@ -2,6 +2,7 @@ from django.db import models
 from django.core import validators
 from montage.settings.common import AUTH_USER_MODEL
 from categories.models import Category
+from accounts.models import MontageUser
 
 
 class ImpressionQuerySet(models.query.QuerySet):
@@ -64,15 +65,9 @@ class HearsayQuerySet(models.query.QuerySet):
         return self.filter(is_collaged=False)
 
 
-class HearsayManager(models.Manager):
-    def get_query_set(self):
-        return HearsayQuerySet(self.model)
-
-    def __getattr__(self, name):
-        return getattr(self.get_query_set(), name)
-
-
 class Hearsay(models.Model):
+    objects = HearsayQuerySet().as_manager()
+
     class Meta:
         verbose_name = 'Hearsay'
         verbose_name_plural = 'Hearsays'
@@ -82,6 +77,12 @@ class Hearsay(models.Model):
     # Impressionがなくなったとき、画面には表示しなくなるがデータは残す
     impression = models.ForeignKey(
         Impression,
+        related_name='rev_hearsay',
+        blank=True, null=True, default=None,
+        on_delete=models.SET_NULL
+    )
+    user = models.ForeignKey(
+        MontageUser,
         related_name='rev_hearsay',
         blank=True, null=True, default=None,
         on_delete=models.SET_NULL
@@ -104,7 +105,7 @@ class Hearsay(models.Model):
 
     def __str__(self):
         """Printしたときはaboutを返す"""
-        return self.about
+        return self.content
 
     @property
     def display_content(self):
