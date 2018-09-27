@@ -29,11 +29,6 @@ if not DEBUG:
         # 'cloudinary',
         # 'cloudinary_storage',
     ]
-    MIDDLEWARE += [
-        'corsheaders.middleware.CorsMiddleware',
-        'django.middleware.common.CommonMiddleware',
-        'whitenoise.middleware.WhiteNoiseMiddleware',
-    ]
 
     # メール
     # EMAIL_HOST = 'smtp.gmail.com'
