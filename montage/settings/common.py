@@ -10,7 +10,8 @@ from .settings_secret import (DATABASE_NAME, DATABASE_USER,
 
 # 開発環境のホスト名をhostnameに入力し、
 # see: https://mmmmemo.com/20180615_python_django_02/
-hostname = '564f62e4dbfb'
+hostname = 'e1539e6b5abb'
+print(socket.gethostname())
 if socket.gethostname() == hostname:
     DEBUG = True
 else:

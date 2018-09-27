@@ -9,6 +9,10 @@ from montage.schema import schema
 from montage.settings.common import MEDIA_URL, MEDIA_ROOT
 from montage.settings.common import DEBUG
 
+
+from django.views.decorators.csrf import csrf_exempt
+
+
 urlpatterns = [
     path(r'admin/', admin.site.urls),
     # namespace for django 2.1 see: https://mocabrown.com/blog/archives/5346
