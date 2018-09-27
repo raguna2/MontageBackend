@@ -23,10 +23,17 @@ if not DEBUG:
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
 
-    # INSTALLED_APPS += [
-    #     'cloudinary',
-    #     'cloudinary_storage',
-    # ]
+    CORS_ORIGIN_ALLOW_ALL = True
+    INSTALLED_APPS += [
+        'corsheaders'
+        # 'cloudinary',
+        # 'cloudinary_storage',
+    ]
+    MIDDLEWARE += [
+        'corsheaders.middleware.CorsMiddleware',
+        'django.middleware.common.CommonMiddleware',
+        'whitenoise.middleware.WhiteNoiseMiddleware',
+    ]
 
     # メール
     # EMAIL_HOST = 'smtp.gmail.com'
@@ -34,11 +41,6 @@ if not DEBUG:
     # EMAIL_HOST_USER = 'lv42s923@gmail.com'
     # EMAIL_HOST_PASSWORD = '7506kutsumi'
     # EMAIL_USE_TLS = True
-
-    # Whitenoise
-    # MIDDLEWARE += [
-    # 'whitenoise.middleware.WhiteNoiseMiddleware',
-    # ]
 
     # CDNにCloudinaryを仕様
     # CLOUDINARY_STORAGE = {
