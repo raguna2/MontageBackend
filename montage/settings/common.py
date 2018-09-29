@@ -22,7 +22,12 @@ GRAPHENE = {
     'SCHEMA': 'montage.schema.schema'
 }
 ALLOWED_HOSTS = ['*']
-
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ORIGIN_WHITELIST = (
+    'localhost:8000',
+    'localhost:8080',
+    'localhost:8040',
+)
 # デプロイで失敗時にメールを飛ばしてくれる
 # see: http://hideharaaws.hatenablog.com/entry/2014/12/14/005342
 ADMINS = (('Name', 'kutsumi.for.public@gmail.com'))
@@ -70,6 +75,7 @@ CONTRIB_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
 ]
 PROJECT_APPS = [
     'accounts',
@@ -84,6 +90,7 @@ INSTALLED_APPS = CONTRIB_APPS + PROJECT_APPS + EXTERNAL_APPS
 # アプリケーション情報 -------------------------------------------------
 # ミドルウェア
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -95,6 +102,9 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
+MIDDLEWARE_CLASS = (
+    'app.CorsMiddleware'
+)
 # ミドルウェア
 # DATABASE ------------------------------------------
 DATABASES = {

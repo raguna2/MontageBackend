@@ -100,8 +100,4 @@ class Query(graphene.ObjectType):
         return Hearsay.objects.all()
 
 
-
-
-
-
 schema = graphene.Schema(query=Query)
