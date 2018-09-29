@@ -17,7 +17,8 @@ urlpatterns = [
     path(r'admin/', admin.site.urls),
     # namespace for django 2.1 see: https://mocabrown.com/blog/archives/5346
     path('', include(('accounts.urls', 'accounts'),)),
-    path('gql/', GraphQLView.as_view(graphiql=True)),
+    path('gql/', csrf_exempt(GraphQLView.as_view(graphiql=True))),
+
 ]
 
 urlpatterns += static(MEDIA_URL, document_root=MEDIA_ROOT)
