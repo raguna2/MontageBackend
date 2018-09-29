@@ -1,26 +1,20 @@
 import socket
 import sys
-import environ
 from pathlib import Path
 
-from .settings_secret import (DATABASE_NAME, DATABASE_USER,
-                              GOOGLE_RECAPTCHA_SECRET_KEY, SECRET_KEY,
-                              SOCIAL_AUTH_TWITTER_KEY,
-                              SOCIAL_AUTH_TWITTER_SECRET)
+import environ
+
+from .settings_secret import (
+    DATABASE_NAME, DATABASE_USER, GOOGLE_RECAPTCHA_SECRET_KEY, SECRET_KEY,
+    SOCIAL_AUTH_TWITTER_KEY, SOCIAL_AUTH_TWITTER_SECRET)
 
 # 開発環境のホスト名をhostnameに入力し、
 # see: https://mmmmemo.com/20180615_python_django_02/
 hostname = 'e1539e6b5abb'
-print(socket.gethostname())
-if socket.gethostname() == hostname:
-    DEBUG = True
-else:
-    DEBUG = False
+DEBUG = False
 
 AUTH_USER_MODEL = 'accounts.MontageUser'
-GRAPHENE = {
-    'SCHEMA': 'montage.schema.schema'
-}
+GRAPHENE = {'SCHEMA': 'montage.schema.schema'}
 ALLOWED_HOSTS = ['*']
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ORIGIN_WHITELIST = (
@@ -30,7 +24,7 @@ CORS_ORIGIN_WHITELIST = (
 )
 # デプロイで失敗時にメールを飛ばしてくれる
 # see: http://hideharaaws.hatenablog.com/entry/2014/12/14/005342
-ADMINS = (('Name', 'kutsumi.for.public@gmail.com'))
+# ADMINS = (('Name', 'kutsumi.for.public@gmail.com'))
 
 # ファイルパスの設定  --------------------------------------------------
 # BASE_DIRはmanage.pyがあるディレクトリ
@@ -73,18 +67,16 @@ CONTRIB_APPS = [
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
+    'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'corsheaders',
 ]
-PROJECT_APPS = [
-    'accounts',
-    'categories',
-    'portraits'
-]
+SITE_ID = 1
+PROJECT_APPS = ['accounts', 'categories', 'portraits']
 EXTERNAL_APPS = [
     'graphene_django',
     'django_filters',
+    'corsheaders',
 ]
 INSTALLED_APPS = CONTRIB_APPS + PROJECT_APPS + EXTERNAL_APPS
 # アプリケーション情報 -------------------------------------------------
@@ -102,9 +94,9 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
-MIDDLEWARE_CLASS = (
-    'app.CorsMiddleware'
-)
+# MIDDLEWARE_CLASS = (
+#     'app.CorsMiddleware'
+# )
 # ミドルウェア
 # DATABASE ------------------------------------------
 DATABASES = {
@@ -120,16 +112,20 @@ DATABASES = {
 # バリデータ ----------------------------------------
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        'NAME':
+        'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'NAME':
+        'django.contrib.auth.password_validation.MinimumLengthValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        'NAME':
+        'django.contrib.auth.password_validation.CommonPasswordValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        'NAME':
+        'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
 # バリデータ ----------------------------------------
@@ -163,7 +159,7 @@ LOGGING = {
             'formatter': 'all',  # どの出力フォーマットで出すかを名前で指定
         },
         'console': {  # どこに出すかの設定をもう一つ、こちらの設定には`console`という名前
-            'level': 'DEBUG',
+            'level': 'ERROR',
             # こちらは標準出力に出してくれるクラスを指定
             'class': 'logging.StreamHandler',
             'formatter': 'all'
