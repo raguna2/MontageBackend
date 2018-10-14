@@ -1,5 +1,5 @@
 from accounts.models import MontageUser
-from portraits.models import (Impression, Hearsay)
+from portraits.models import (Question, Impression)
 from categories.models import Category
 
 import graphene
@@ -17,22 +17,22 @@ class UserType(DjangoObjectType):
         model = MontageUser
 
 
-class ImpressionType(DjangoObjectType):
-    """ImpressionType."""
+class QuestionType(DjangoObjectType):
+    """QuestionType."""
     display_about = graphene.String(source='display_about')
 
     class Meta:
         """Meta."""
-        model = Impression
+        model = Question
 
 
-class HearsayType(DjangoObjectType):
-    """HearsayType."""
+class ImpressionType(DjangoObjectType):
+    """ImpressionType."""
     display_content = graphene.String(source='display_content')
 
     class Meta:
         """Meta."""
-        model = Hearsay
+        model = Impression
 
 
 class CategoryType(DjangoObjectType):
@@ -60,10 +60,10 @@ class Query(graphene.ObjectType):
     users = graphene.List(UserType)
     category = graphene.Field(CategoryType, name=graphene.String())
     categories = graphene.List(CategoryType)
-    impression = graphene.Field(ImpressionType, user_id=graphene.Int())
+    question = graphene.Field(QuestionType, user_id=graphene.Int())
+    questions = graphene.List(QuestionType)
+    impression = graphene.Field(ImpressionType, question=graphene.String())
     impressions = graphene.List(ImpressionType)
-    hearsay = graphene.Field(HearsayType, impression=graphene.String())
-    hearsays = graphene.List(HearsayType)
 
     searched_users = DjangoFilterConnectionField(UserSearchType)
 
@@ -79,17 +79,17 @@ class Query(graphene.ObjectType):
     def resolve_categories(self, info):
         return Category.objects.all()
 
-    def resolve_impression(self, user_id, info):
-        return Impression.objects.get(user__pk=user_id)
+    def resolve_question(self, user_id, info):
+        return Question.objects.get(user__pk=user_id)
+
+    def resolve_questions(self, info):
+        return Question.objects.all()
+
+    def resolve_impression(self, question, info):
+        return Impression.objects.get(question=question)
 
     def resolve_impressions(self, info):
         return Impression.objects.all()
-
-    def resolve_hearsay(self, impression, info):
-        return Hearsay.objects.get(impression=impression)
-
-    def resolve_hearsays(self, info):
-        return Hearsay.objects.all()
 
 
 schema = graphene.Schema(query=Query)
