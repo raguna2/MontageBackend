@@ -5,7 +5,7 @@ from categories.models import Category
 from montage.settings.common import AUTH_USER_MODEL
 
 
-class ImpressionQuerySet(models.query.QuerySet):
+class QuestionQuerySet(models.query.QuerySet):
     def presonalized(self):
         """
         個人のページで作成された質問だけに絞る
@@ -19,23 +19,23 @@ class ImpressionQuerySet(models.query.QuerySet):
         return self.filter(is_personal=False)
 
 
-class Impression(models.Model):
-    objects = ImpressionQuerySet().as_manager()
+class Question(models.Model):
+    objects = QuestionQuerySet().as_manager()
 
     class Meta:
-        verbose_name = 'Impression'
-        verbose_name_plural = 'Impressions'
+        verbose_name = 'Question'
+        verbose_name_plural = 'Questions'
         ordering = ('-updated_at', )
 
-    # 逆参照時: MontageUser.rev_impression.all()
+    # 逆参照時: MontageUser.rev_question.all()
     user = models.ManyToManyField(
-        AUTH_USER_MODEL, related_name='rev_impression')
+        AUTH_USER_MODEL, related_name='rev_question')
     about = models.CharField(max_length=42, )
     # 逆参照時: Category.rev_impression.all()
-    # カテゴリが削除されてもImpressionは残す
+    # カテゴリが削除されてもQuestionは残す
     category = models.ForeignKey(
         Category,
-        related_name='rev_impression',
+        related_name='rev_question',
         blank=True,
         null=True,
         default=None,
