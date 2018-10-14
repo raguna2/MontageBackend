@@ -1,17 +1,20 @@
-import socket
+import os
 import sys
 from pathlib import Path
 
 import environ
 
-from .settings_secret import (
-    DATABASE_NAME, DATABASE_USER, GOOGLE_RECAPTCHA_SECRET_KEY, SECRET_KEY,
-    SOCIAL_AUTH_TWITTER_KEY, SOCIAL_AUTH_TWITTER_SECRET)
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
+
+from .settings_secret import (DATABASE_NAME, DATABASE_USER,
+                              GOOGLE_RECAPTCHA_SECRET_KEY, SECRET_KEY,
+                              SOCIAL_AUTH_TWITTER_KEY,
+                              SOCIAL_AUTH_TWITTER_SECRET)
 
 # 開発環境のホスト名をhostnameに入力し、
 # see: https://mmmmemo.com/20180615_python_django_02/
-hostname = 'e1539e6b5abb'
-DEBUG = False
+DEBUG = True
 
 AUTH_USER_MODEL = 'accounts.MontageUser'
 GRAPHENE = {'SCHEMA': 'montage.schema.schema'}
@@ -24,7 +27,7 @@ CORS_ORIGIN_WHITELIST = (
 )
 # デプロイで失敗時にメールを飛ばしてくれる
 # see: http://hideharaaws.hatenablog.com/entry/2014/12/14/005342
-# ADMINS = (('Name', 'kutsumi.for.public@gmail.com'))
+ADMINS = (('Name', 'kutsumi.for.public@gmail.com'))
 
 # ファイルパスの設定  --------------------------------------------------
 # BASE_DIRはmanage.pyがあるディレクトリ
@@ -63,6 +66,7 @@ WSGI_APPLICATION = 'montage.wsgi.application'
 # ファイルパスの設定  --------------------------------------------------
 # アプリケーション情報 -------------------------------------------------
 CONTRIB_APPS = [
+    'jet',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -77,8 +81,10 @@ EXTERNAL_APPS = [
     'graphene_django',
     'django_filters',
     'corsheaders',
+    'django_extensions',
+    'django_cleanup',
 ]
-INSTALLED_APPS = CONTRIB_APPS + PROJECT_APPS + EXTERNAL_APPS
+INSTALLED_APPS = EXTERNAL_APPS + PROJECT_APPS + CONTRIB_APPS
 # アプリケーション情報 -------------------------------------------------
 # ミドルウェア
 MIDDLEWARE = [
@@ -137,45 +143,68 @@ USE_L10N = True
 USE_TZ = True
 # Localize --------------------------
 # LOGGING_SETTINGS-----------------------------------------------------------------
+# see: https://qiita.com/tnnsst35/items/c7d8705cb412e7869d47
 LOGGING = {
-    'version': 1,   # これを設定しないと怒られる
-    'formatters': {  # 出力フォーマットを文字列形式で指定する
-        'all': {    # 出力フォーマットに`all`という名前をつける
-            'format': '\t'.join([
-                "[%(levelname)s]",
-                "asctime:%(asctime)s",
-                "module:%(module)s",
-                "message:%(message)s",
-                "process:%(process)d",
-                "thread:%(thread)d",
-            ])
+    'version': 1,
+    'disable_existing_loggers': True,
+    'formatters': {
+        'verbose': {
+            'format':
+            f'[*%(levelname)s*] %(asctime)s\t場所:%(pathname)s/%(filename)s\n'
+            f'処理が止まった場所:%(funcName)sの%(lineno)d行目\n'
+            f'エラーメッセージ:%(message)s'
+        },
+        'log_filing': {
+            'format':
+            f'%(levelname)s\t%(asctime)s\t%(pathname)s\t%(filename)s\t'
+            f'%(funcName)s\t%(lineno)d\t%(message)s'
+        },
+        'simple': {
+            'format': '%(levelname)s\t%(message)s'
         },
     },
-    'handlers': {  # ログをどこに出すかの設定
-        'file': {  # どこに出すかの設定に名前をつける `file`という名前をつけている
-            'level': 'DEBUG',  # DEBUG以上のログを取り扱うという意味
-            'class': 'logging.FileHandler',  # ログを出力するためのクラスを指定
-            'filename': str(BASE_DIR / 'django.log'),  # どこに出すか
-            'formatter': 'all',  # どの出力フォーマットで出すかを名前で指定
+    'handlers': {
+        'null': {
+            'level': 'DEBUG',
+            'class': 'logging.NullHandler',
+            'formatter': 'simple'
         },
-        'console': {  # どこに出すかの設定をもう一つ、こちらの設定には`console`という名前
-            'level': 'ERROR',
-            # こちらは標準出力に出してくれるクラスを指定
+        'console': {
+            'level': 'DEBUG',
             'class': 'logging.StreamHandler',
-            'formatter': 'all'
+            'formatter': 'verbose'
         },
+        'logfile': {
+            'level': 'ERROR',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': str(BASE_DIR / 'django.log'),
+            'maxBytes': 1024 * 1024 * 5,  # 5MB
+            'backupCount': 0,
+            'formatter': 'log_filing',
+        }
     },
-    'loggers': {  # どんなloggerがあるかを設定する
-        'command': {  # commandという名前のloggerを定義
-            'handlers': ['file', 'console'],  # 先述のfile, consoleの設定で出力
+    'loggers': {
+        'django_debug': {
+            'handlers': ['null', 'console'],
+            'propagate': True,
             'level': 'DEBUG',
         },
-    },
+        'error_handling': {
+            'handlers': ['console', 'logfile'],
+            'level': 'ERROR',
+            'propagate': False
+        },
+    }
 }
 # LOGGING_SETTINGS-----------------------------------------------------------------
 # Sentry --------------------------------------------------------------------------
-
 sentry_sdk.init(
     dsn="https://de580293695e4353893fdd2f499fd65e@sentry.io/1291134",
     integrations=[DjangoIntegration()])
 # Sentry --------------------------------------------------------------------------
+# Django-jet ----------------------------------------------------------------------
+JET_DEFAULT_THEME = 'default'
+# サイドバーを見やすくする
+JET_SIDE_MENU_COMPACT = True
+# Django-jet ----------------------------------------------------------------------
+

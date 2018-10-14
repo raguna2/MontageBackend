@@ -1,24 +1,19 @@
-from logging import DEBUG as log_debug
-from logging import StreamHandler, getLogger
 from os import environ
 
 # Heroku
 import django_heroku
 
-logger = getLogger(__name__)
-handler = StreamHandler()
-handler.setLevel(log_debug)
-logger.setLevel(log_debug)
-logger.addHandler(handler)
+from montage.apps.logging import logger_d, logger_e
 
 try:
+    logger_d.info('prodを読み込んでいます')
     from .common import *
+    logger_d.info('prodとcommonが読み込まれました')
 except ImportError:
-    logger.error('/settings/common.pyがうまくインポート出来ていません')
+    logger_e.error('/settings/common.pyがうまくインポート出来ていません')
 
 # ここは本番用のみに適用される
 # herokuの設定,S3の設定,
-logger.info('ログ出力')
 DEBUG = True
 # ALLOWED_HOSTSにherokuのURLを書く
 ALLOWED_HOSTS = ['*']
