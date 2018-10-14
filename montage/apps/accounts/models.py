@@ -8,6 +8,8 @@ from django.db import models
 USERNAME_VALID_TEXT = 'ユーザー名には半角英数、アンダースコアだけ使えます'
 USERNAME_VALIDATOR = validators.RegexValidator(r'^[a-zA-Z0-9_]+$',
                                                USERNAME_VALID_TEXT)
+def get_add():
+    Pato
 
 
 def get_image_path(instance, filename):

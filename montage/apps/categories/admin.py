@@ -9,4 +9,4 @@ class CategoryInline(admin.StackedInline):
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     fields = ['name', 'description']
-    list_display = ('id', 'name', 'description')
+    list_display = ('name', 'description')

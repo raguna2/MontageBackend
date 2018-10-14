@@ -1,6 +1,5 @@
 from django.contrib import admin
 from .models import Impression, Hearsay
-from django.db import utils
 
 
 class ImpressionInline(admin.TabularInline):

@@ -19,21 +19,30 @@ class MontageUserAdmin(admin.ModelAdmin):
                        ('email', 'mail_confirmed'), ('first_name', 'last_name'))
         }),
         ('Advanced options', {
-            'classes': ('collapse',),
+            'classes': ('collapse', ),
             'fields': ('is_staff', 'is_superuser', 'is_active'),
-        }),)
+        }),
+    )
     add_fieldsets = ((None, {
         'classes': ('wide', ),
         'fields': ('username', 'password1', 'password2'),
     }), )
     list_display = (
-        'id', 'username', 'display_name', 'is_staff',
-        'is_superuser', 'email', 'date_of_birth',
-        'mail_confirmed', 'upper_case_name',
-        'is_active', 'created_date', 'modified_date',
+        'id',
+        'username',
+        'display_name',
+        'is_staff',
+        'is_superuser',
+        'email',
+        'date_of_birth',
+        'mail_confirmed',
+        'upper_case_name',
+        'is_active',
+        'created_date',
+        'modified_date',
     )
     # 編集ページへのリンクをつける項目はどれか示す
-    list_display_links = (('username',))
+    list_display_links = (('username', ))
     list_filter = ('username', )
     search_fields = ['username']
     ordering = ('username', )

@@ -1,8 +1,8 @@
 from django.db import models
-from django.core import validators
-from montage.settings.common import AUTH_USER_MODEL
-from categories.models import Category
+
 from accounts.models import MontageUser
+from categories.models import Category
+from montage.settings.common import AUTH_USER_MODEL
 
 
 class ImpressionQuerySet(models.query.QuerySet):
@@ -25,19 +25,21 @@ class Impression(models.Model):
     class Meta:
         verbose_name = 'Impression'
         verbose_name_plural = 'Impressions'
-        ordering = ('-updated_at',)
+        ordering = ('-updated_at', )
 
     # 逆参照時: MontageUser.rev_impression.all()
-    user = models.ManyToManyField(AUTH_USER_MODEL, related_name='rev_impression')
-    about = models.CharField(max_length=42,)
+    user = models.ManyToManyField(
+        AUTH_USER_MODEL, related_name='rev_impression')
+    about = models.CharField(max_length=42, )
     # 逆参照時: Category.rev_impression.all()
     # カテゴリが削除されてもImpressionは残す
     category = models.ForeignKey(
         Category,
         related_name='rev_impression',
-        blank=True, null=True, default=None,
-        on_delete=models.SET_NULL
-    )
+        blank=True,
+        null=True,
+        default=None,
+        on_delete=models.SET_NULL)
     appeared_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     is_personal = models.BooleanField(
@@ -46,8 +48,7 @@ class Impression(models.Model):
                   ユーザが独自に作成したものであればTrue,
                   運営が作成したものならFalse
                   """,
-        default=False
-    )
+        default=False)
 
     def __str__(self):
         """printされたときはaboutを返す"""
@@ -71,37 +72,35 @@ class Hearsay(models.Model):
     class Meta:
         verbose_name = 'Hearsay'
         verbose_name_plural = 'Hearsays'
-        ordering = ('-posted_at',)
+        ordering = ('-posted_at', )
 
     # 逆参照時: Impression.rev_hearsay.all()
     # Impressionがなくなったとき、画面には表示しなくなるがデータは残す
     impression = models.ForeignKey(
         Impression,
         related_name='rev_hearsay',
-        blank=True, null=True, default=None,
-        on_delete=models.SET_NULL
-    )
+        blank=True,
+        null=True,
+        default=None,
+        on_delete=models.SET_NULL)
     user = models.ForeignKey(
         MontageUser,
         related_name='rev_hearsay',
-        blank=True, null=True, default=None,
-        on_delete=models.SET_NULL
-    )
+        blank=True,
+        null=True,
+        default=None,
+        on_delete=models.SET_NULL)
     content = models.CharField(
         'うわさ',
         max_length=42,
         help_text='うわさの内容',
     )
     posted_at = models.DateTimeField(
-        '作成日',
-        help_text='うわさが投稿された日',
-        auto_now_add=True
-    )
+        '作成日', help_text='うわさが投稿された日', auto_now_add=True)
     is_collaged = models.BooleanField(
         '変更されているか',
         help_text='collageされた場合画面には表示させないためにTrueにする',
-        default=False
-    )
+        default=False)
 
     def __str__(self):
         """Printしたときはaboutを返す"""
