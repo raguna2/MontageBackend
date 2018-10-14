@@ -1,10 +1,13 @@
 from accounts.models import MontageUser
 from portraits.models import (Question, Impression)
 from categories.models import Category
+from .forms import CategoryForm
 
 import graphene
 from graphene_django import DjangoObjectType
 from graphene_django.filter import DjangoFilterConnectionField
+from graphene_django.forms.mutation import DjangoModelFormMutation
+from graphene_django.forms.mutation import DjangoFormMutation
 
 
 class UserType(DjangoObjectType):
@@ -55,6 +58,29 @@ class UserSearchType(DjangoObjectType):
         interfaces = (graphene.relay.Node, )
 
 
+class CategoryMutation(DjangoModelFormMutation):
+    """
+    カテゴリを作成するMutation
+
+    Example
+    =========
+    mutation {
+      createCategory(input: {name: "スポーツ", description: "スポーツに関すること"}){
+        category{
+          name
+          description
+        }
+      }
+    }
+    """
+    class Meta:
+        form_class = CategoryForm
+
+
+class Mutation(graphene.ObjectType):
+    create_category = CategoryMutation.Field()
+
+
 class Query(graphene.ObjectType):
     user = graphene.Field(UserType, username=graphene.String())
     users = graphene.List(UserType)
@@ -92,4 +118,4 @@ class Query(graphene.ObjectType):
         return Impression.objects.all()
 
 
-schema = graphene.Schema(query=Query)
+schema = graphene.Schema(query=Query, mutation=Mutation)
