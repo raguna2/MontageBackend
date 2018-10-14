@@ -1,13 +1,13 @@
 from django.contrib import admin
-from .models import Impression, Hearsay
+from .models import Question, Impression
 
 
-class ImpressionInline(admin.TabularInline):
+class QuestionInline(admin.TabularInline):
     model = Impression
 
 
-@admin.register(Impression)
-class ImpressionAdmin(admin.ModelAdmin):
+@admin.register(Question)
+class QuestionAdmin(admin.ModelAdmin):
     # 入力フィールド
     fields = ['user', 'about', 'category', 'is_personal']
     # 登録したものが見れるところ
@@ -15,12 +15,12 @@ class ImpressionAdmin(admin.ModelAdmin):
     filter_horizontal = ('user',)
 
 
-class HearsayInline(admin.StackedInline):
-    model = Hearsay
+class ImpressionInline(admin.StackedInline):
+    model = Impression
 
 
-@admin.register(Hearsay)
-class HearsayAdmin(admin.ModelAdmin):
-    fields = ['impression', 'user', 'content', 'posted_at', 'is_collaged']
-    list_display = ('impression', 'user', 'content', 'posted_at', 'is_collaged')
+@admin.register(Impression)
+class ImpressionAdmin(admin.ModelAdmin):
+    fields = ['question', 'user', 'content', 'posted_at', 'is_collaged']
+    list_display = ('question', 'user', 'content', 'posted_at', 'is_collaged')
     readonly_fields = ('posted_at',)
