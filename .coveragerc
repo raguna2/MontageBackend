@@ -1,0 +1,15 @@
+# for coverage.py (pytest-cov)
+[run]
+omit =
+    # genrated files
+    montage/manage.py
+    montage/wsgi.py
+    montage/settings/*
+    montage/apps/*/migrations/*
+    montage/apps/*/admin.py
+    montage/apps/*/apps.py
+    montage/apps/*/urls.py
+    montage/__init__.py
+    montage/urls.py
+    montage/apps/*/__init__.py
+
