@@ -67,36 +67,28 @@ class Query(graphene.ObjectType):
 
     searched_users = DjangoFilterConnectionField(UserSearchType)
 
-    @graphene.resolve_only_args
-    def resolve_user(self, username):
+    def resolve_user(self, username, info):
         return MontageUser.objects.get(username=username)
 
-    @graphene.resolve_only_args
-    def resolve_users(self):
+    def resolve_users(self, info):
         return MontageUser.objects.all()
 
-    @graphene.resolve_only_args
-    def resolve_category(self, name):
+    def resolve_category(self, name, info):
         return Category.objects.get(name=name)
 
-    @graphene.resolve_only_args
-    def resolve_categories(self):
+    def resolve_categories(self, info):
         return Category.objects.all()
 
-    @graphene.resolve_only_args
-    def resolve_impression(self, user_id):
+    def resolve_impression(self, user_id, info):
         return Impression.objects.get(user__pk=user_id)
 
-    @graphene.resolve_only_args
-    def resolve_impressions(self):
+    def resolve_impressions(self, info):
         return Impression.objects.all()
 
-    @graphene.resolve_only_args
-    def resolve_hearsay(self, impression):
+    def resolve_hearsay(self, impression, info):
         return Hearsay.objects.get(impression=impression)
 
-    @graphene.resolve_only_args
-    def resolve_hearsays(self):
+    def resolve_hearsays(self, info):
         return Hearsay.objects.all()
 
 
