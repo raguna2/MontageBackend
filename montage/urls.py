@@ -10,6 +10,7 @@ from montage.schema import schema
 from montage.settings.common import DEBUG, MEDIA_ROOT, MEDIA_URL
 
 urlpatterns = [
+    path('jet/', include(('jet.urls', 'jet'), )),
     path('admin/', admin.site.urls),
     # namespace for django 2.1 see: https://mocabrown.com/blog/archives/5346
     path('', include(('accounts.urls', 'accounts'), )),
