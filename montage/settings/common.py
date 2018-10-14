@@ -76,7 +76,11 @@ CONTRIB_APPS = [
     'django.contrib.staticfiles',
 ]
 SITE_ID = 1
-PROJECT_APPS = ['accounts', 'categories', 'portraits']
+PROJECT_APPS = [
+    'accounts.apps.AccountsConfig',
+    'categories.apps.CategoriesConfig',
+    'portraits.apps.PortraitsConfig',
+]
 EXTERNAL_APPS = [
     'graphene_django',
     'django_filters',
