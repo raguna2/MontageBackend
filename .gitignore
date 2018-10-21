@@ -29,3 +29,4 @@ django.log
 .pytest_cache/
 .tox/
 .tags
+.vscode/
