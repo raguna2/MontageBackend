@@ -1,93 +1,33 @@
-from accounts.models import MontageUser
-from portraits.models import (Question, Impression)
-from categories.models import Category
-from .forms import CategoryForm
+from montage.apps.accounts.models import MontageUser
+from montage.apps.portraits.models import (Question, Impression)
+from montage.apps.categories.models import Category
 
 import graphene
-from graphene_django import DjangoObjectType
 from graphene_django.filter import DjangoFilterConnectionField
-from graphene_django.forms.mutation import DjangoModelFormMutation
-from graphene_django.forms.mutation import DjangoFormMutation
 
-
-class UserType(DjangoObjectType):
-    """UserType."""
-    # sourceと一緒に定義することでpropertyをGQLで取得できる
-    as_atsign = graphene.String(source='as_atsign')
-
-    class Meta:
-        """Meta."""
-        model = MontageUser
-
-
-class QuestionType(DjangoObjectType):
-    """QuestionType."""
-    display_about = graphene.String(source='display_about')
-
-    class Meta:
-        """Meta."""
-        model = Question
-
-
-class ImpressionType(DjangoObjectType):
-    """ImpressionType."""
-    display_content = graphene.String(source='display_content')
-
-    class Meta:
-        """Meta."""
-        model = Impression
-
-
-class CategoryType(DjangoObjectType):
-    """CategoryType"""
-    class Meta:
-        """Meta."""
-        model = Category
-
-
-class UserSearchType(DjangoObjectType):
-    """UserSearchType."""
-    as_atsign = graphene.String(source='as_atsign')
-
-    class Meta:
-        """Meta."""
-        model = MontageUser
-        filter_fields = {
-            'username': ["icontains"],
-        }
-        interfaces = (graphene.relay.Node, )
-
-
-class CategoryMutation(DjangoModelFormMutation):
-    """
-    カテゴリを作成するMutation
-
-    Example
-    =========
-    mutation {
-      createCategory(input: {name: "スポーツ", description: "スポーツに関すること"}){
-        category{
-          name
-          description
-        }
-      }
-    }
-    """
-    class Meta:
-        form_class = CategoryForm
+from .schemas.category_schema import (CategoryType, CreateCategoryMutation,
+                                      UpdateCategoryMutation, DeleteCategoryMutation)
+from .schemas.user_schema import (UserType, UserSearchType)
+from .schemas.impression_schema import ImpressionType
+from .schemas.question_schema import QuestionType
 
 
 class Mutation(graphene.ObjectType):
-    create_category = CategoryMutation.Field()
+    create_category = CreateCategoryMutation.Field()
+    update_category = UpdateCategoryMutation.Field()
+    delete_category = DeleteCategoryMutation.Field()
 
 
 class Query(graphene.ObjectType):
     user = graphene.Field(UserType, username=graphene.String())
     users = graphene.List(UserType)
+
     category = graphene.Field(CategoryType, name=graphene.String())
     categories = graphene.List(CategoryType)
+
     question = graphene.Field(QuestionType, user_id=graphene.Int())
     questions = graphene.List(QuestionType)
+
     impression = graphene.Field(ImpressionType, question=graphene.String())
     impressions = graphene.List(ImpressionType)
 
