@@ -1,6 +1,6 @@
 from django.db import models
 
-from montage.apps.accounts.models import MontageUser
+from accounts.models import MontageUser
 from categories.models import Category
 from montage.settings.common import AUTH_USER_MODEL
 

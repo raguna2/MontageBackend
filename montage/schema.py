@@ -1,6 +1,6 @@
-from montage.apps.accounts.models import MontageUser
-from montage.apps.portraits.models import (Question, Impression)
-from montage.apps.categories.models import Category
+from accounts.models import MontageUser
+from portraits.models import (Question, Impression)
+from categories.models import Category
 
 import graphene
 from graphene_django.filter import DjangoFilterConnectionField

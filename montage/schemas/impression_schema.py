@@ -1,7 +1,8 @@
-from montage.apps.portraits.models import Impression
+from portraits.models import Impression
 
 import graphene
 from graphene_django import DjangoObjectType
+
 
 class ImpressionType(DjangoObjectType):
     """ImpressionType."""

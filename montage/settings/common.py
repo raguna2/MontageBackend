@@ -77,7 +77,7 @@ CONTRIB_APPS = [
 ]
 SITE_ID = 1
 PROJECT_APPS = [
-    'accounts.apps.AccountsConfig',
+    'montage.apps.accounts.apps.AccountsConfig',
     'categories.apps.CategoriesConfig',
     'portraits.apps.PortraitsConfig',
 ]
@@ -88,7 +88,7 @@ EXTERNAL_APPS = [
     'django_extensions',
     'django_cleanup',
 ]
-INSTALLED_APPS = EXTERNAL_APPS + PROJECT_APPS + CONTRIB_APPS
+INSTALLED_APPS = CONTRIB_APPS + EXTERNAL_APPS + PROJECT_APPS
 # アプリケーション情報 -------------------------------------------------
 # ミドルウェア
 MIDDLEWARE = [

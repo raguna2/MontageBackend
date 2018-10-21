@@ -1,4 +1,4 @@
-from montage.apps.portraits.models import Question
+from portraits.models import Question
 
 import graphene
 from graphene_django import DjangoObjectType
