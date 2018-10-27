@@ -91,5 +91,21 @@ class DeleteCategoryMutation(graphene.Mutation):
 
     def mutate(self, info, id):
         Category.objects.filter(id=id).delete()
-
         return DeleteCategoryMutation(id=id)
+
+
+class Mutation(graphene.ObjectType):
+    create_category = CreateCategoryMutation.Field()
+    update_category = UpdateCategoryMutation.Field()
+    delete_category = DeleteCategoryMutation.Field()
+
+
+class Query(graphene.ObjectType):
+    category = graphene.Field(CategoryType, name=graphene.String())
+    categories = graphene.List(CategoryType)
+
+    def resolve_category(self, name, info):
+        return Category.objects.get(name=name)
+
+    def resolve_categories(self, info):
+        return Category.objects.all()
