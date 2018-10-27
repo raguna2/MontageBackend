@@ -40,3 +40,4 @@ pytest==3.8.2
 pytest-django==3.4.3
 factory_boy==2.11.1
 pytest-cov==2.6.0
+djangorestframework==3.8.2
