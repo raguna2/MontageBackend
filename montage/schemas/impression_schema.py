@@ -1,3 +1,5 @@
+from django.core.exceptions import ObjectDoesNotExist
+
 from accounts.models import MontageUser
 from portraits.models import Question
 from portraits.models import Impression
@@ -17,7 +19,7 @@ import logging
 
 class ImpressionType(DjangoObjectType):
     """ImpressionType."""
-    # display_content = graphene.String(source='display_content')
+
     class Meta:
         """Meta."""
         model = Impression
