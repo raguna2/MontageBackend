@@ -11,7 +11,7 @@ class QuestionAdmin(admin.ModelAdmin):
     # 入力フィールド
     fields = ['user', 'about', 'category', 'is_personal']
     # 登録したものが見れるところ
-    list_display = ('about', 'category', 'appeared_at', 'updated_at', 'is_personal')
+    list_display = ('id', 'about', 'category', 'appeared_at', 'updated_at', 'is_personal')
     filter_horizontal = ('user',)
 
 
