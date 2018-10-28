@@ -6,15 +6,6 @@ from portraits.models import Impression
 
 import graphene
 from graphene_django import DjangoObjectType
-from .user_schema import UserType
-from .question_schema import QuestionType
-
-from rest_framework import serializers
-from graphene_django.rest_framework.mutation import SerializerMutation
-
-from django.db.transaction import atomic
-
-import logging
 
 
 class ImpressionType(DjangoObjectType):
@@ -29,26 +20,46 @@ class CreateImpressionMutation(graphene.Mutation):
     """
     Impressionの作成
 
+    IN
+    ------
+    mutation{
+      createImpression(userId: 1, questionId: 22, content: "質問への回答"){
+        impression{
+          id
+          question{
+            about
+          }
+          content
+        }
+      }
+    }
     """
-    id = graphene.Int()
-    question = graphene.Field(QuestionType)
-    user = graphene.Field(UserType)
-    content = graphene.String()
-    posted_at = graphene.DateTime()
-    is_collaged = graphene.Boolean()
+    impression = graphene.Field(ImpressionType)
+    ok = graphene.Boolean()
 
-    class Arguments:
-        content = graphene.String()
-        user_id = graphene.Int()
-        question_id = graphene.Int()
+    class Input:
+        question_id = graphene.Int(required=True)
+        user_id = graphene.Int(required=True)
+        content = graphene.String(required=True)
 
-    def mutate(self, info, content, user_id, question_id):
-        user = MontageUser.objects.get(id=user_id)
-        question = Question.objects.get(id=question_id)
-        imp = Impression.objects.create(content=content, user=user, question=question)
-        imp.save()
+    def mutate(self, info, question_id, user_id, content):
+        # イジられる側のユーザ
+        user_id = user_id
+        ok = True
 
-        return CreateImpressionMutation(content=content, user_id=user_id, question_id=question_id)
+        try:
+            # イジられる側のユーザを取得
+            user = MontageUser.objects.get(id=user_id)
+        except ObjectDoesNotExist:
+            ok = False
+
+        question = Question.objects.get(id=question_id, user=user)
+
+        impression = Impression.objects.create(
+            user=user, question=question, content=content)
+        impression.save()
+        return CreateImpressionMutation(impression=impression, ok=ok)
+
 
 class DeleteImpressionMutation(graphene.Mutation):
     """
@@ -71,22 +82,20 @@ class DeleteImpressionMutation(graphene.Mutation):
         }
       }
     }
-
     """
-    id = graphene.Int()
-    question = graphene.Field(QuestionType)
-    user = graphene.Field(UserType)
-    content = graphene.String()
-    posted_at = graphene.DateTime()
-    is_collaged = graphene.Boolean()
+    ok = graphene.Boolean()
 
     class Arguments:
         id = graphene.Int()
 
     def mutate(self, info, id):
-        Impression.objects.filter(id=id).delete()
+        try:
+            Impression.objects.filter(id=id).delete()
+            ok = True
+        except ObjectDoesNotExist:
+            ok = False
 
-        return DeleteImpressionMutation(id=id)
+        return DeleteImpressionMutation(id=id, ok=ok)
 
 
 class Mutation(graphene.ObjectType):
