@@ -1,4 +1,4 @@
-from montage.apps.accounts.models import MontageUser
+from accounts.models import MontageUser
 
 import graphene
 from graphene_django import DjangoObjectType

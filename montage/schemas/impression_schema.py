@@ -1,5 +1,6 @@
-f/Users/kutsumi/dockerdir/montage/montage/schemas/question_schema.pyrom portraits.models import Impression, Question
 from accounts.models import MontageUser
+from portraits.models import Question
+from portraits.models import Impression
 
 import graphene
 from graphene_django import DjangoObjectType

@@ -1,20 +1,70 @@
+from accounts.models import MontageUser
 from portraits.models import Question
+from categories.models import Category
+
+from .category_schema import CategoryType
+from .user_schema import UserType
 
 import graphene
 from graphene_django import DjangoObjectType
 
 
+from montage.apps.logging import logger_d, logger_e
+
+
 class QuestionType(DjangoObjectType):
     """QuestionType."""
-    # display_about = graphene.String(source='display_about')
+    # display_about = graphene.String(source='display_about') class Meta:
     class Meta:
         """Meta."""
         model = Question
 
 
+class CreateQuestionMutation(graphene.Mutation):
+    """
+    Questionの作成
+    """
+    question = graphene.Field(QuestionType)
+
+    class Arguments:
+        about = graphene.String()
+
+    def mutate(self, info, about):
+        user_id = info.context.user.id
+        # category_id = info.context.category.id
+        user = MontageUser.objects.get(id=user_id)
+        # ユーザが作成したものは自動的にmy_questionカテゴリになる
+        category = Category.objects.get(name='my_question')
+        # ユーザが質問を作る用のMutationなのでis_personalはデフォルト値
+        question = Question.objects.create(about=about, category=category)
+        # userはmanytomany
+        question.user.add(user)
+        question.save()
+        return CreateQuestionMutation(question=question)
+
+
+class DeleteQuestionMutation(graphene.Mutation):
+    """
+    Questionの削除
+    """
+    ok = graphene.Boolean()
+
+    class Arguments:
+        id = graphene.Int()
+
+    def mutate(self, info, id):
+        question = Question.objects.filter(id=id)
+        try:
+            question.delete()
+            ok = True
+        except:
+            logger_e.error('削除できませんでした')
+        return DeleteQuestionMutation(ok=ok)
+
+
 class Mutation(graphene.ObjectType):
-    # TODO: Mutationの追加
-    pass
+    create_question = CreateQuestionMutation.Field()
+    delete_question = DeleteQuestionMutation.Field()
 
 
 class Query(graphene.ObjectType):
