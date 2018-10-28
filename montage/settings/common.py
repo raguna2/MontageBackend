@@ -80,6 +80,7 @@ PROJECT_APPS = [
     'montage.apps.accounts.apps.AccountsConfig',
     'categories.apps.CategoriesConfig',
     'portraits.apps.PortraitsConfig',
+    'relationships.apps.RelationshipsConfig',
 ]
 EXTERNAL_APPS = [
     'graphene_django',
