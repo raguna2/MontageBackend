@@ -28,3 +28,5 @@ django.log
 .coverage
 .pytest_cache/
 .tox/
+.tags
+.vscode/

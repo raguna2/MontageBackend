@@ -76,7 +76,11 @@ CONTRIB_APPS = [
     'django.contrib.staticfiles',
 ]
 SITE_ID = 1
-PROJECT_APPS = ['accounts', 'categories', 'portraits']
+PROJECT_APPS = [
+    'montage.apps.accounts.apps.AccountsConfig',
+    'categories.apps.CategoriesConfig',
+    'portraits.apps.PortraitsConfig',
+]
 EXTERNAL_APPS = [
     'graphene_django',
     'django_filters',
@@ -84,7 +88,7 @@ EXTERNAL_APPS = [
     'django_extensions',
     'django_cleanup',
 ]
-INSTALLED_APPS = EXTERNAL_APPS + PROJECT_APPS + CONTRIB_APPS
+INSTALLED_APPS = CONTRIB_APPS + EXTERNAL_APPS + PROJECT_APPS
 # アプリケーション情報 -------------------------------------------------
 # ミドルウェア
 MIDDLEWARE = [
