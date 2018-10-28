@@ -81,6 +81,7 @@ PROJECT_APPS = [
     'categories.apps.CategoriesConfig',
     'portraits.apps.PortraitsConfig',
     'relationships.apps.RelationshipsConfig',
+    'friendships.apps.FriendshipsConfig',
 ]
 EXTERNAL_APPS = [
     'graphene_django',
