@@ -26,6 +26,7 @@ class ImpressionType(DjangoObjectType):
 class CreateImpressionMutation(graphene.Mutation):
     """
     Impressionの作成
+
     """
     id = graphene.Int()
     question = graphene.Field(QuestionType)
@@ -46,7 +47,6 @@ class CreateImpressionMutation(graphene.Mutation):
         imp.save()
 
         return CreateImpressionMutation(content=content, user_id=user_id, question_id=question_id)
-
 
 class DeleteImpressionMutation(graphene.Mutation):
     """
