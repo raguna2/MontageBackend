@@ -1,20 +1,17 @@
+from django.core.exceptions import ObjectDoesNotExist
+
 from accounts.models import MontageUser
 from portraits.models import Question
 from categories.models import Category
 
-from .category_schema import CategoryType
-from .user_schema import UserType
-
 import graphene
 from graphene_django import DjangoObjectType
 
-
-from montage.apps.logging import logger_d, logger_e
+from montage.apps.logging import logger_e
 
 
 class QuestionType(DjangoObjectType):
     """QuestionType."""
-    # display_about = graphene.String(source='display_about') class Meta:
     class Meta:
         """Meta."""
         model = Question
@@ -31,7 +28,6 @@ class CreateQuestionMutation(graphene.Mutation):
 
     def mutate(self, info, about):
         user_id = info.context.user.id
-        # category_id = info.context.category.id
         user = MontageUser.objects.get(id=user_id)
         # ユーザが作成したものは自動的にmy_questionカテゴリになる
         category = Category.objects.get(name='my_question')
@@ -57,8 +53,9 @@ class DeleteQuestionMutation(graphene.Mutation):
         try:
             question.delete()
             ok = True
-        except:
-            logger_e.error('削除できませんでした')
+        except ObjectDoesNotExist:
+            logger_e.error('存在しないオブジェクトは削除できません')
+
         return DeleteQuestionMutation(ok=ok)
 
 
