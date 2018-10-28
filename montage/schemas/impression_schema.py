@@ -48,30 +48,6 @@ class CreateImpressionMutation(graphene.Mutation):
         return CreateImpressionMutation(content=content, user_id=user_id, question_id=question_id)
 
 
-class UpdateImpressionMutation(graphene.Mutation):
-    """
-    Impressionの更新
-
-    """
-    id = graphene.Int()
-    question = graphene.Field(QuestionType)
-    user = graphene.Field(UserType)
-    content = graphene.String()
-    posted_at = graphene.DateTime()
-    is_collaged = graphene.Boolean()
-
-    class Arguments:
-        id = graphene.Int()
-        content = graphene.String()
-
-    def mutate(self, info, id, content):
-        imp = Impression.objects.get(id=id)
-        imp.content = content
-        imp.save()
-
-        return UpdateImpressionMutation(id=id, content=content)
-
-
 class DeleteImpressionMutation(graphene.Mutation):
     """
     Impressionの削除
@@ -110,9 +86,9 @@ class DeleteImpressionMutation(graphene.Mutation):
 
         return DeleteImpressionMutation(id=id)
 
+
 class Mutation(graphene.ObjectType):
     create_impression = CreateImpressionMutation.Field()
-    update_impression = UpdateImpressionMutation.Field()
     delete_impression = DeleteImpressionMutation.Field()
 
 
