@@ -7,10 +7,10 @@ class Relationship(models.Model):
     """
     フォロー機能の関係を表す中間モデル
 
-    follows:
+    following:
         フォローする人
 
-    followers:
+    followed:
         フォローされた人
     """
     following = models.ForeignKey(
