@@ -1,22 +1,17 @@
 from django.contrib import admin
-from django.contrib.auth.forms import UserChangeForm
+from . import models
 
 from accounts.models import MontageUser
 
-from . import models
-
-
-class UserChangeForm(UserChangeForm):
-    class Meta(UserChangeForm.Meta):
-        model = models.MontageUser
-
 
 class MontageUserAdmin(admin.ModelAdmin):
-    form = UserChangeForm
     fieldsets = (
         (None, {
-            'fields': ('username', 'password', 'display_name', 'date_of_birth',
-                       ('email', 'mail_confirmed'), ('first_name', 'last_name'))
+            'fields': ('username', 'password', 'display_name',
+                       'date_of_birth', 'profile_image',
+                       ('email', 'mail_confirmed'),
+                       ('first_name', 'last_name')
+                       )
         }),
         ('Advanced options', {
             'classes': ('collapse', ),

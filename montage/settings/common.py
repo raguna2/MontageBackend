@@ -89,6 +89,8 @@ EXTERNAL_APPS = [
     'corsheaders',
     'django_extensions',
     'django_cleanup',
+    'cloudinary',
+    'cloudinary_storage',
 ]
 INSTALLED_APPS = CONTRIB_APPS + EXTERNAL_APPS + PROJECT_APPS
 # アプリケーション情報 -------------------------------------------------
@@ -214,3 +216,12 @@ JET_DEFAULT_THEME = 'default'
 JET_SIDE_MENU_COMPACT = True
 # Django-jet ----------------------------------------------------------------------
 
+# Cloudinary ----------------------------------------------------------------------
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': 'hugc8unfj',
+    'API_KEY': '996998834614578',
+    'API_SECRET': 'BIAsPbHyek7dAULy0nGGQQnMn3M',
+}
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+# Cloudinary ----------------------------------------------------------------------

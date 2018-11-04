@@ -79,7 +79,6 @@ class MontageUser(AbstractBaseUser, PermissionsMixin):
         help_text="確認済みの場合True",
         default=False,
     )
-    # profile_image = models.ImageField('プロフィール画像', upload_to=get_image_path, blank=True)
     first_name = models.CharField(
         '名字', help_text='first_name', max_length=30, default='', blank=True)
     last_name = models.CharField(
@@ -90,6 +89,9 @@ class MontageUser(AbstractBaseUser, PermissionsMixin):
         '登録日時', help_text='created_date', auto_now_add=True)
     modified_date = models.DateTimeField(
         '更新日時', help_text='modified_date', auto_now=True)
+    profile_image = models.ImageField(
+        'profile_image', help_text='プロフィール画像',
+        width='200', height='200', blank=True)
 
     def __str__(self):
         return self.username
@@ -110,3 +112,7 @@ class MontageUser(AbstractBaseUser, PermissionsMixin):
     def get_short_name(self):
         """名字だけ返す"""
         return self.first_name
+
+    def save(self):
+
+        return super(MontageUser, self).save()

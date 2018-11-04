@@ -30,10 +30,6 @@ CSRF_COOKIE_SECURE = True
 
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = False
-# INSTALLED_APPS += [
-#     # 'cloudinary',
-#     # 'cloudinary_storage',
-# ]
 
 # メール
 # EMAIL_HOST = 'smtp.gmail.com'
@@ -41,11 +37,3 @@ CORS_ALLOW_CREDENTIALS = False
 # EMAIL_HOST_USER = 'lv42s923@gmail.com'
 # EMAIL_HOST_PASSWORD = '7506kutsumi'
 # EMAIL_USE_TLS = True
-
-# CDNにCloudinaryを仕様
-# CLOUDINARY_STORAGE = {
-# 'CLOUD_NAME': 'kutsumi',
-# 'API_KEY': '967867132254792',
-# 'API_SECRET': 'oVNO1aizJ8zL7NlmqEHvI7y2fgk'
-# }
-# DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
