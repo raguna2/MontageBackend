@@ -30,3 +30,5 @@ django.log
 .tox/
 .tags
 .vscode/
+*.xml
+*.iml
