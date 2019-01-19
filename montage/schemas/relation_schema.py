@@ -69,6 +69,10 @@ class CreateRelationshipMutation(graphene.Mutation):
       }
     }
 
+    Notes
+    --------
+    info.context.userはログインしているユーザ情報なので、
+    ログインしない状態でフォローしてもAnonymousUserが渡されてだめ
     ------
     """
     relation = graphene.Field(RelationshipType)
