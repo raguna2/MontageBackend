@@ -12,6 +12,8 @@ from .settings_secret import (DATABASE_NAME, DATABASE_USER,
                               SOCIAL_AUTH_TWITTER_KEY,
                               SOCIAL_AUTH_TWITTER_SECRET)
 
+import cloudinary
+
 # 開発環境のホスト名をhostnameに入力し、
 # see: https://mmmmemo.com/20180615_python_django_02/
 DEBUG = True
@@ -66,7 +68,7 @@ WSGI_APPLICATION = 'montage.wsgi.application'
 # ファイルパスの設定  --------------------------------------------------
 # アプリケーション情報 -------------------------------------------------
 CONTRIB_APPS = [
-    'jet',
+    # 'jet',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -84,6 +86,7 @@ PROJECT_APPS = [
     'friendships.apps.FriendshipsConfig',
 ]
 EXTERNAL_APPS = [
+    'social_django',
     'graphene_django',
     'django_filters',
     'corsheaders',
@@ -102,15 +105,20 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'graphql_jwt.middleware.JSONWebTokenMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
-# MIDDLEWARE_CLASS = (
-#     'app.CorsMiddleware'
-# )
+
+AUTHENTICATION_BACKENDS = [
+    'social_core.backends.twitter.TwitterOAuth',
+    'graphql_jwt.backends.JSONWebTokenBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+SOCIAL_AUTH_POSTGRES_JSONFIELD = True
 # ミドルウェア
 # DATABASE ------------------------------------------
 DATABASES = {
@@ -211,9 +219,9 @@ sentry_sdk.init(
     integrations=[DjangoIntegration()])
 # Sentry --------------------------------------------------------------------------
 # Django-jet ----------------------------------------------------------------------
-JET_DEFAULT_THEME = 'default'
+# JET_DEFAULT_THEME = 'default'
 # サイドバーを見やすくする
-JET_SIDE_MENU_COMPACT = True
+# JET_SIDE_MENU_COMPACT = True
 # Django-jet ----------------------------------------------------------------------
 
 # Cloudinary ----------------------------------------------------------------------

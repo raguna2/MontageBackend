@@ -1,23 +1,16 @@
 from pathlib import Path
 
+from montage.apps.logging import logger_e
 from django.contrib.auth.models import (AbstractBaseUser, BaseUserManager,
                                         PermissionsMixin)
 from django.core import validators
 from django.db import models
 
+import cloudinary
+
 USERNAME_VALID_TEXT = 'ユーザー名には半角英数、アンダースコアだけ使えます'
 USERNAME_VALIDATOR = validators.RegexValidator(r'^[a-zA-Z0-9_]+$',
                                                USERNAME_VALID_TEXT)
-
-
-def get_image_path(instance, filename):
-    """画像の保存先を取得する
-
-    :param instance: Userのインスタンス
-    :param filename: プロフィール画像のファイルの名前
-    """
-    path = Path('user-icon') / str(instance.username) / filename
-    return path.resolve()
 
 
 class MontageUserManager(BaseUserManager):
@@ -90,11 +83,13 @@ class MontageUser(AbstractBaseUser, PermissionsMixin):
     modified_date = models.DateTimeField(
         '更新日時', help_text='modified_date', auto_now=True)
     profile_image = models.ImageField(
-        'profile_image', help_text='プロフィール画像',
-        width='200', height='200', blank=True)
+        'profile_image', help_text='プロフィール画像', blank=True)
 
     def __str__(self):
         return self.username
+
+    def save(self, *args, **kwargs):
+        super(MontageUser, self).save(*args, **kwargs)
 
     @property
     def as_atsign(self):
@@ -112,7 +107,3 @@ class MontageUser(AbstractBaseUser, PermissionsMixin):
     def get_short_name(self):
         """名字だけ返す"""
         return self.first_name
-
-    def save(self):
-
-        return super(MontageUser, self).save()

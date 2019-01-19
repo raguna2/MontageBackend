@@ -13,6 +13,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     # namespace for django 2.1 see: https://mocabrown.com/blog/archives/5346
     path('', include(('accounts.urls', 'accounts'), )),
+    path('social/', include(('social_django.urls', 'social'), )),
     path('gql/', csrf_exempt(GraphQLView.as_view(graphiql=True))),
 ]
 

@@ -18,7 +18,7 @@ class RelationshipType(DjangoObjectType):
         """Meta."""
         model = Relationship
         filter_fields = {
-            'following__username': ["exact"],
+            'following_id': ["exact"],
         }
         interfaces = (graphene.Node, )
 
@@ -139,15 +139,43 @@ class Mutation(graphene.ObjectType):
 
 
 class Query(graphene.ObjectType):
-    relation = DjangoFilterConnectionField(RelationshipType)
-    relations = graphene.List(RelationshipType)
+    """
+    フォローしている側のユーザIDを指定して友達一覧を取得する
 
-    def resolve_relation(self, following__username, info):
-        user = MontageUser.objects.get_object_or_404(
-            username=following__username
-        )
-        return Relationship.objects.filter(user=user)
+    IN
+    -------
+    query{
+      relations(followingId: 1){
+        edges{
+          node{
+            following{
+              username
+            }
+            followed{
+              username
+            }
+          }
+        }
+      }
+    }
 
-    def resolve_relations(self, following_user_id, info):
-        user = MontageUser.objects.get_object_or_404(id=following_user_id)
-        return Relationship.objects.filter(user=user)
+    OUT
+    ------
+    {
+      "data": {
+        "relations": {
+          "edges": [
+            {
+              "node": {
+                "following": {
+                  "username": "montage"
+                },
+                "followed": {
+                  "username": "kai"
+                }
+              }
+            },
+        }
+    }
+    """
+    relations = DjangoFilterConnectionField(RelationshipType)

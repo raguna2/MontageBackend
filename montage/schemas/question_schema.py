@@ -3,6 +3,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from accounts.models import MontageUser
 from portraits.models import Question
 from categories.models import Category
+from .user_schema import UserType
 
 import graphene
 from graphene_django import DjangoObjectType
@@ -12,6 +13,17 @@ from montage.apps.logging import logger_e
 
 class QuestionType(DjangoObjectType):
     """QuestionType."""
+
+    class Meta:
+        """Meta."""
+        model = Question
+
+
+class FilteredQuestionType(DjangoObjectType):
+    """QuestionType."""
+    personalized = graphene.Field(QuestionType, source='personalized')
+    masters = graphene.Field(QuestionType, source='masters')
+
     class Meta:
         """Meta."""
         model = Question
@@ -21,7 +33,7 @@ class CreateQuestionMutation(graphene.Mutation):
     """
     Questionの作成
     """
-    question = graphene.Field(QuestionType)
+    question = graphene.Field(FilteredQuestionType)
 
     class Arguments:
         about = graphene.String()
@@ -65,8 +77,8 @@ class Mutation(graphene.ObjectType):
 
 
 class Query(graphene.ObjectType):
-    question = graphene.Field(QuestionType, user_id=graphene.Int())
-    questions = graphene.List(QuestionType)
+    question = graphene.Field(FilteredQuestionType, user_id=graphene.Int())
+    questions = graphene.List(FilteredQuestionType)
 
     def resolve_question(self, user_id, info):
         return Question.objects.get(user__pk=user_id)

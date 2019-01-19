@@ -8,5 +8,5 @@ from .question_schema import (
     Query as question_query, Mutation as question_mute)
 from .relation_schema import (
     Query as relate_query, Mutation as relate_mute)
-# from .friendship_schema import (
-#     Query as friendship_query, Mutation as friendship_mute)
+from .friendship_schema import (
+    Query as friendship_query, Mutation as friendship_mute)
