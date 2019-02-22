@@ -30,10 +30,3 @@ CSRF_COOKIE_SECURE = True
 
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = False
-
-# メール
-# EMAIL_HOST = 'smtp.gmail.com'
-# EMAIL_PORT = 587
-# EMAIL_HOST_USER = 'lv42s923@gmail.com'
-# EMAIL_HOST_PASSWORD = '7506kutsumi'
-# EMAIL_USE_TLS = True

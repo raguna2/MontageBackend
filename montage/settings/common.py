@@ -90,8 +90,7 @@ EXTERNAL_APPS = [
     'graphene_django',
     'django_filters',
     'corsheaders',
-    'django_extensions',
-    'django_cleanup',
+    'django_cleanup', # ファイルアップロード
     'cloudinary',
     'cloudinary_storage',
 ]

@@ -1,14 +1,30 @@
-# 元となるイメージを指定
-FROM python:3.7
-# バッファにデータを保持しない設定(1でなくても任意の文字でいい)
+FROM python:3.7.2-slim-stretch
+
+ARG PYTHONDEVREQUIRES="0"
+
+EXPOSE 8000
+
+ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED 1
-# コンテナの中にディレクトリを作成
+ENV MONTAGE_GUNICORN_WORKERS=4
+
 RUN mkdir -p /app
-# 作業ディレクトリを指定
-WORKDIR /app
-# pipでインストールするパッケージをまとめたファイルを /appディレクトリにコピー
-COPY requirements.txt /app/
-RUN pip install -r requirements.txt
-# ローカルのDockerfileを設置したディレクトリ内のファイルをコンテナの/appディレクトリへコピー
 COPY . /app/
-CMD python manage.py runserver 0.0.0.0:$PORT
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends && \
+    apt-get install -y default-libmysqlclient-dev && \
+    apt-get install -y gcc && \
+    pip install -r dev-requires.txt
+
+RUN \
+    # Install dev-requires for testing
+    if [ "${PYTHONDEVREQUIRES}" = "1" ] ; then \
+        pip install -r dev-requires.txt; \
+    fi
+
+CMD gunicorn -w $MONTAGE_GUNICORN_WORKERS\
+    --log-level INFO\
+    -b 0.0.0.0:$PORT\
+    -e DJANGO_SETTINGS_MODULE=settings.common\
+    lbc_match.wsgi:application
