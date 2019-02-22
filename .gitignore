@@ -1,4 +1,6 @@
 /montage/settings/settings_secret.py
+dive.log
+.env
 
 # Python bytecode:
 *.py[co]
@@ -22,7 +24,7 @@ django.log
 /media/user-icon/*
 .DS_Store
 
-.mypy_cache/
+.mypy_cache
 
 # testing
 .coverage

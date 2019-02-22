@@ -1,20 +1,23 @@
-# ymlファイルのバージョン指定
 version: '3'
-# コンテナを定義
 services:
-    # サービス1
     postgres:
+      container_name: montage_db
       image: postgres:10.5
-    # サービス2
+      env_file: .env
+      ports:
+        - "5432:5432"
+      volumes:
+        - "postgres:/var/lib/postgresql/montage/data"
     web:
-        # Dockerfileをビルド
         build: .
+        container_name: montage_web
+        env_file: .env
         command: python manage.py runserver 0.0.0.0:8000
-        # マウント場所を指定
         volumes:
             - .:/app
         ports:
             - "8000:8000"
-        # dbサービスが立ち上がってから起動するように指定
         depends_on:
             - postgres
+volumes:
+  postgres:
