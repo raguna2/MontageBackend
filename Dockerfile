@@ -10,12 +10,13 @@ ENV MONTAGE_GUNICORN_WORKERS=4
 
 RUN mkdir -p /app
 COPY . /app/
+WORKDIR /app
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends && \
     apt-get install -y default-libmysqlclient-dev && \
     apt-get install -y gcc && \
-    pip install -r dev-requires.txt
+    pip install -r requirements.txt
 
 RUN \
     # Install dev-requires for testing
