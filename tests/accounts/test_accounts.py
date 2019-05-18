@@ -10,9 +10,8 @@ class TestMainView:
 
     @pytest.mark.parametrize(
         'url,expected', [
-            ('/', 200,),
+            ('/gql/', 400,),
             ('/admin/login/?next=/admin/', 200,),
-            # ('/gql/', 200,),
         ]
     )
     def test_it(self, target, url, expected):

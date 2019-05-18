@@ -1,6 +1,7 @@
 /montage/settings/settings_secret.py
 dive.log
 .env
+venv
 
 # Python bytecode:
 *.py[co]

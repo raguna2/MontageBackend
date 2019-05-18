@@ -68,7 +68,6 @@ WSGI_APPLICATION = 'montage.wsgi.application'
 # ファイルパスの設定  --------------------------------------------------
 # アプリケーション情報 -------------------------------------------------
 CONTRIB_APPS = [
-    # 'jet',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -79,7 +78,7 @@ CONTRIB_APPS = [
 ]
 SITE_ID = 1
 PROJECT_APPS = [
-    'montage.apps.accounts.apps.AccountsConfig',
+    'accounts.apps.AccountsConfig',
     'categories.apps.CategoriesConfig',
     'portraits.apps.PortraitsConfig',
     'relationships.apps.RelationshipsConfig',
