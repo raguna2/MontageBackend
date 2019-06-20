@@ -56,20 +56,19 @@ TEMPLATES = [
         },
     },
 ]
-# 相対パス
 STATIC_URL = '/static/'
 MEDIA_URL = "/media/"
-# 絶対パス
 MEDIA_ROOT = str(BASE_DIR / 'media')
 STATIC_ROOT = str(BASE_DIR / 'static')
 SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/complete/'
 
 ROOT_URLCONF = 'montage.urls'
 WSGI_APPLICATION = 'montage.wsgi.application'
-# ファイルパスの設定  --------------------------------------------------
-# アプリケーション情報 -------------------------------------------------
+
+###########################
+# Apps
+###########################
 CONTRIB_APPS = [
-    # 'jet',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -96,8 +95,10 @@ EXTERNAL_APPS = [
     'cloudinary_storage',
 ]
 INSTALLED_APPS = CONTRIB_APPS + EXTERNAL_APPS + PROJECT_APPS
-# アプリケーション情報 -------------------------------------------------
-# ミドルウェア
+
+###########################
+# MiddleWare
+###########################
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
@@ -119,8 +120,10 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
 ]
 SOCIAL_AUTH_POSTGRES_JSONFIELD = True
-# ミドルウェア
-# DATABASE ------------------------------------------
+
+###########################
+# DATABASE
+###########################
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -130,8 +133,10 @@ DATABASES = {
         'PORT': 5432,
     }
 }
-# DATABASE ------------------------------------------
-# バリデータ ----------------------------------------
+
+###########################
+# Validator
+###########################
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME':
@@ -150,15 +155,20 @@ AUTH_PASSWORD_VALIDATORS = [
         'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-# バリデータ ----------------------------------------
-# Localize --------------------------
+
+###########################
+# Localize
+###########################
 LANGUAGE_CODE = 'ja'
 TIME_ZONE = 'Asia/Tokyo'
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
-# Localize --------------------------
-# LOGGING_SETTINGS-----------------------------------------------------------------
+
+
+###########################
+# LOGGING
+###########################
 # see: https://qiita.com/tnnsst35/items/c7d8705cb412e7869d47
 LOGGING = {
     'version': 1,
@@ -212,19 +222,16 @@ LOGGING = {
         },
     }
 }
-# LOGGING_SETTINGS-----------------------------------------------------------------
-# Sentry --------------------------------------------------------------------------
+###########################
+# Sentry
+###########################
 sentry_sdk.init(
     dsn="https://de580293695e4353893fdd2f499fd65e@sentry.io/1291134",
     integrations=[DjangoIntegration()])
-# Sentry --------------------------------------------------------------------------
-# Django-jet ----------------------------------------------------------------------
-# JET_DEFAULT_THEME = 'default'
-# サイドバーを見やすくする
-# JET_SIDE_MENU_COMPACT = True
-# Django-jet ----------------------------------------------------------------------
 
-# Cloudinary ----------------------------------------------------------------------
+###########################
+# Cloudinary
+###########################
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
     'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
@@ -237,4 +244,3 @@ cloudinary.config(
     api_key=os.environ.get('CLOUDINARY_API_KEY'),
     api_secret=os.environ.get('CLOUDINARY_API_SECRET'),
 )
-# Cloudinary ----------------------------------------------------------------------
