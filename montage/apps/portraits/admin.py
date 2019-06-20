@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import Question, Impression
+from .models.questions import Question
+from .models.impressions import Impression
 
 
 class QuestionInline(admin.TabularInline):

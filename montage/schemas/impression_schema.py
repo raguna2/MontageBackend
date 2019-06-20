@@ -1,11 +1,12 @@
 from django.core.exceptions import ObjectDoesNotExist
 
 from accounts.models import MontageUser
-from portraits.models import Question
-from portraits.models import Impression
+from portraits.models.questions import Question
+from portraits.models.impressions import Impression
 
 import graphene
 from graphene_django import DjangoObjectType
+from graphene_django.filter import DjangoFilterConnectionField
 
 
 class ImpressionType(DjangoObjectType):
@@ -14,6 +15,17 @@ class ImpressionType(DjangoObjectType):
     class Meta:
         """Meta."""
         model = Impression
+
+
+class UserImpressionsType(DjangoObjectType):
+
+    class Meta:
+        """Meta."""
+        model = Impression
+        # filter_fields = {
+        #     'user.username': ["exact"],
+        # }
+        # interfaces = (graphene.Node, )
 
 
 class CreateImpressionMutation(graphene.Mutation):
@@ -106,9 +118,48 @@ class Mutation(graphene.ObjectType):
 class Query(graphene.ObjectType):
     impression = graphene.Field(ImpressionType, question=graphene.String())
     impressions = graphene.List(ImpressionType)
+    user_impressions = graphene.List(UserImpressionsType, username=graphene.String())
 
     def resolve_impression(self, question, info):
         return Impression.objects.get(question=question)
 
     def resolve_impressions(self, info):
         return Impression.objects.all()
+
+    def resolve_user_impressions(self, info, username):
+        """ユーザ毎の回答済みimpressionsを取得するときのクエリ結果
+
+
+        Notes
+        ----------
+        IN
+        query{
+          userImpressions(username: "RAGUNA2"){
+            id
+            question{
+              id
+              about
+            }
+            content
+          }
+        }
+
+        OUT
+        {
+          "data": {
+            "userImpressions": [
+              {
+                "id": "4",
+                "question": {
+                  "id": "1",
+                  "about": "性別は?"
+                },
+                "content": "男"
+              },
+              ...
+            ]
+          }
+        }
+        """
+        user = MontageUser.objects.get(username=username)
+        return Impression.objects.filter(user=user)

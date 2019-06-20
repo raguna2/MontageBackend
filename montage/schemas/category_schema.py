@@ -1,7 +1,8 @@
 from django.core.exceptions import ObjectDoesNotExist
 
 from accounts.models import MontageUser
-from portraits.models import (Question, Impression)
+from portraits.models.questions import Question
+from portraits.models.impressions import Impression
 from categories.models import Category
 from django.forms import ModelForm
 from django.forms import ValidationError

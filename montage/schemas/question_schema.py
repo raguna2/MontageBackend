@@ -1,7 +1,7 @@
 from django.core.exceptions import ObjectDoesNotExist
 
 from accounts.models import MontageUser
-from portraits.models import Question
+from portraits.models.questions import Question
 from categories.models import Category
 from .user_schema import UserType
 
