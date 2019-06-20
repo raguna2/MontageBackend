@@ -34,3 +34,4 @@ django.log
 .vscode/
 *.xml
 *.iml
+venv
