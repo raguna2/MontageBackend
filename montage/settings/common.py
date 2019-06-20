@@ -62,6 +62,7 @@ MEDIA_URL = "/media/"
 # 絶対パス
 MEDIA_ROOT = str(BASE_DIR / 'media')
 STATIC_ROOT = str(BASE_DIR / 'static')
+SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/complete/'
 
 ROOT_URLCONF = 'montage.urls'
 WSGI_APPLICATION = 'montage.wsgi.application'
@@ -225,10 +226,15 @@ sentry_sdk.init(
 
 # Cloudinary ----------------------------------------------------------------------
 CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': 'hugc8unfj',
-    'API_KEY': '996998834614578',
-    'API_SECRET': 'BIAsPbHyek7dAULy0nGGQQnMn3M',
+    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
+    'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
+    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
 }
 
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+cloudinary.config(
+    cloud_name=os.environ.get('CLOUDINARY_CLOUD_NAME'),
+    api_key=os.environ.get('CLOUDINARY_API_KEY'),
+    api_secret=os.environ.get('CLOUDINARY_API_SECRET'),
+)
 # Cloudinary ----------------------------------------------------------------------
