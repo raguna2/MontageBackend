@@ -50,7 +50,3 @@ class Impression(models.Model):
     def __str__(self):
         """Printしたときはcontentを返す"""
         return self.content
-
-    @property
-    def display_content(self):
-        return f'A: {self.content}'

@@ -1,4 +1,5 @@
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.paginator import Paginator
 
 from accounts.models import MontageUser
 from portraits.models.questions import Question
@@ -15,17 +16,6 @@ class ImpressionType(DjangoObjectType):
     class Meta:
         """Meta."""
         model = Impression
-
-
-class UserImpressionsType(DjangoObjectType):
-
-    class Meta:
-        """Meta."""
-        model = Impression
-        # filter_fields = {
-        #     'user.username': ["exact"],
-        # }
-        # interfaces = (graphene.Node, )
 
 
 class CreateImpressionMutation(graphene.Mutation):
@@ -116,9 +106,19 @@ class Mutation(graphene.ObjectType):
 
 
 class Query(graphene.ObjectType):
+    # 任意の質問に対する回答の一覧
     impression = graphene.Field(ImpressionType, question=graphene.String())
+
+    # すべての回答
     impressions = graphene.List(ImpressionType)
-    user_impressions = graphene.List(UserImpressionsType, username=graphene.String())
+
+    # ユーザ毎の回答済み一覧
+    user_impressions = graphene.List(
+        ImpressionType,
+        username=graphene.String(),
+        page=graphene.Int(),
+        size=graphene.Int(),
+    )
 
     def resolve_impression(self, question, info):
         return Impression.objects.get(question=question)
@@ -126,9 +126,19 @@ class Query(graphene.ObjectType):
     def resolve_impressions(self, info):
         return Impression.objects.all()
 
-    def resolve_user_impressions(self, info, username):
+    def resolve_user_impressions(self, info, username, page, size):
         """ユーザ毎の回答済みimpressionsを取得するときのクエリ結果
 
+        Parameters
+        -----------
+        username: str
+            ユーザ名
+
+        page: int
+            ページ数
+
+        size: int
+            一度に何個取得するか
 
         Notes
         ----------
@@ -162,4 +172,7 @@ class Query(graphene.ObjectType):
         }
         """
         user = MontageUser.objects.get(username=username)
-        return Impression.objects.filter(user=user)
+        user_impressions = Impression.objects.filter(user=user)
+        start = page * size if page > 0 else 0
+        end = size + page * size if page > 0 else size
+        return user_impressions[start:end]
