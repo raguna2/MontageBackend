@@ -27,5 +27,5 @@ RUN \
 CMD gunicorn -w $MONTAGE_GUNICORN_WORKERS\
     --log-level INFO\
     -b 0.0.0.0:$PORT\
-    -e DJANGO_SETTINGS_MODULE=settings.common\
-    lbc_match.wsgi:application
+    -e DJANGO_SETTINGS_MODULE=montage.settings.prod\
+    montage.wsgi:application
