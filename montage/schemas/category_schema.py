@@ -134,11 +134,11 @@ class Mutation(graphene.ObjectType):
 
 
 class Query(graphene.ObjectType):
-    category = graphene.Field(CategoryType, name=graphene.String())
+    category = graphene.Field(CategoryType, category_name=graphene.String())
     categories = graphene.List(CategoryType)
 
-    def resolve_category(self, name, info):
-        return Category.objects.get(name=name)
+    def resolve_category(self, info, category_name):
+        return Category.objects.get(name=category_name)
 
     def resolve_categories(self, info):
         return Category.objects.all()

@@ -6,7 +6,5 @@ class Category(models.Model):
     description = models.CharField(
         '説明文', max_length=64, help_text='カテゴリの説明文', blank=True)
 
-    # image = models.ImageField()
-
     def __str__(self):
         return self.name
