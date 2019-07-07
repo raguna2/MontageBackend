@@ -38,3 +38,4 @@ django-cloudinary-storage==0.2.3
 Pillow==5.3.0
 social-auth-app-django==2.1.0
 social-auth-core==1.7.0
+requests_oauthlib==1.2.0

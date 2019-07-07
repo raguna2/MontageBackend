@@ -1,7 +1,8 @@
 from django.core.exceptions import ObjectDoesNotExist
 
 from accounts.models import MontageUser
-from portraits.models import Question
+from portraits.models.questions import Question
+from portraits.models.impressions import Impression
 from categories.models import Category
 from .user_schema import UserType
 
@@ -77,11 +78,51 @@ class Mutation(graphene.ObjectType):
 
 
 class Query(graphene.ObjectType):
-    question = graphene.Field(FilteredQuestionType, user_id=graphene.Int())
+    category_questions = graphene.List(
+        FilteredQuestionType,
+        user_id=graphene.Int(),
+        category_name=graphene.String(),
+        page=graphene.Int(),
+        size=graphene.Int(),
+    )
     questions = graphene.List(FilteredQuestionType)
 
-    def resolve_question(self, user_id, info):
-        return Question.objects.get(user__pk=user_id)
+    def resolve_category_questions(self, info, user_id, category_name, page, size):
+        """ユーザのカテゴリごとの質問(未回答のみ)
+
+        IN
+        ---------
+        query{
+          categoryQuestions(userId: 32, categoryName: "あなたについて", page: 0, size: 2){
+            about
+          }
+        }
+
+        OUT
+        --------
+        {
+          "data": {
+            "categoryQuestions": [
+              {
+                "about": "aaaaaaaaaaaaa"
+              },
+              {
+                "about": "趣味は?"
+              },
+              {
+                "about": "座右の銘は?"
+              }
+            ]
+          }
+        }
+
+        """
+        category_questions = Question.objects.filter(
+            user__pk=user_id,
+            category__name=category_name)
+        start = page * size if page > 0 else 0
+        end = size + page * size if page > 0 else size
+        return category_questions[start:end]
 
     def resolve_questions(self, info):
         return Question.objects.all()

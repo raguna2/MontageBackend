@@ -1,11 +1,13 @@
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.paginator import Paginator
 
 from accounts.models import MontageUser
-from portraits.models import Question
-from portraits.models import Impression
+from portraits.models.questions import Question
+from portraits.models.impressions import Impression
 
 import graphene
 from graphene_django import DjangoObjectType
+from graphene_django.filter import DjangoFilterConnectionField
 
 
 class ImpressionType(DjangoObjectType):
@@ -104,11 +106,73 @@ class Mutation(graphene.ObjectType):
 
 
 class Query(graphene.ObjectType):
+    # 任意の質問に対する回答の一覧
     impression = graphene.Field(ImpressionType, question=graphene.String())
+
+    # すべての回答
     impressions = graphene.List(ImpressionType)
 
-    def resolve_impression(self, question, info):
+    # ユーザ毎の回答済み一覧
+    user_impressions = graphene.List(
+        ImpressionType,
+        username=graphene.String(),
+        page=graphene.Int(),
+        size=graphene.Int(),
+    )
+
+    def resolve_impression(self, info, question):
         return Impression.objects.get(question=question)
 
     def resolve_impressions(self, info):
         return Impression.objects.all()
+
+    def resolve_user_impressions(self, info, username, page, size):
+        """ユーザ毎の回答済みimpressionsを取得するときのクエリ結果
+
+        Parameters
+        -----------
+        username: str
+            ユーザ名
+
+        page: int
+            ページ数
+
+        size: int
+            一度に何個取得するか
+
+        Notes
+        ----------
+        IN
+        query{
+          userImpressions(username: "RAGUNA2", page: 2, size: 2){
+            id
+            question{
+              id
+              about
+            }
+            content
+          }
+        }
+
+        OUT
+        {
+          "data": {
+            "userImpressions": [
+              {
+                "id": "4",
+                "question": {
+                  "id": "1",
+                  "about": "性別は?"
+                },
+                "content": "男"
+              },
+              ...
+            ]
+          }
+        }
+        """
+        user = MontageUser.objects.get(username=username)
+        user_impressions = Impression.objects.filter(user=user)
+        start = page * size if page > 0 else 0
+        end = size + page * size if page > 0 else size
+        return user_impressions[start:end]

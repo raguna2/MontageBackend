@@ -1,7 +1,8 @@
 from django.core.exceptions import ObjectDoesNotExist
 
 from accounts.models import MontageUser
-from portraits.models import (Question, Impression)
+from portraits.models.questions import Question
+from portraits.models.impressions import Impression
 from categories.models import Category
 from django.forms import ModelForm
 from django.forms import ValidationError
@@ -133,11 +134,11 @@ class Mutation(graphene.ObjectType):
 
 
 class Query(graphene.ObjectType):
-    category = graphene.Field(CategoryType, name=graphene.String())
+    category = graphene.Field(CategoryType, category_name=graphene.String())
     categories = graphene.List(CategoryType)
 
-    def resolve_category(self, name, info):
-        return Category.objects.get(name=name)
+    def resolve_category(self, info, category_name):
+        return Category.objects.get(name=category_name)
 
     def resolve_categories(self, info):
         return Category.objects.all()
