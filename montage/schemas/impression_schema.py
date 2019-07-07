@@ -120,7 +120,7 @@ class Query(graphene.ObjectType):
         size=graphene.Int(),
     )
 
-    def resolve_impression(self, question, info):
+    def resolve_impression(self, info, question):
         return Impression.objects.get(question=question)
 
     def resolve_impressions(self, info):
@@ -144,7 +144,7 @@ class Query(graphene.ObjectType):
         ----------
         IN
         query{
-          userImpressions(username: "RAGUNA2"){
+          userImpressions(username: "RAGUNA2", page: 2, size: 2){
             id
             question{
               id
