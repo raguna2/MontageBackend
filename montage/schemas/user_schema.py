@@ -244,8 +244,7 @@ class Query(graphene.ObjectType):
     users_unanswered_questions = DjangoFilterConnectionField(
         UsersUnansweredQuestionsType)
     me = graphene.Field(UserType)
-    tokens = graphene.String()
-    tokens2 = graphene.String()
+    request_tokens = graphene.String()
 
     def resolve_me(self, info):
         user = info.context.user
@@ -260,8 +259,8 @@ class Query(graphene.ObjectType):
     def resolve_users(self, info):
         return MontageUser.objects.all()
 
-    def resolve_tokens(self, info):
-
+    def resolve_request_tokens(self, info):
+        """twitterAPIからリクエストトークンを取得する関数"""
         CALLBACK_URL = 'http://127.0.0.1:8080/auth/twitter/callback/'
         twitter_api = OAuth1Session(API_KEY, API_SECRET)
         response = twitter_api.post(
@@ -270,30 +269,4 @@ class Query(graphene.ObjectType):
                 'oauth_callback': CALLBACK_URL
             }
         )
-
         return response.text
-
-    def resolve_tokens2(self, info):
-        twitter_api = OAuth1Session(API_KEY, API_SECRET)
-
-        # user情報を取得する場合
-        username = 'RAGUNA2'
-        url = f"https://api.twitter.com/1.1/users/show.json?screen_name={username}"
-        response = twitter_api.get(url)
-        res = json.loads(response.text)
-
-        # 画像を取得する場合
-        base_image_url = res['profile_image_url'].rsplit('_', 1)[0]
-        image_url_square = base_image_url + '_400x400'
-        r = requests.get(image_url_square, stream=True)
-        filename = f"scale.jpeg"
-        if r.status_code == 200:
-            with open(filename, 'wb') as f:
-                f.write(r.content)
-
-        img = Image.open(filename)
-        img.save('./scale.jpeg')
-
-        # 名前を取得する場合
-        name = res['name']
-        return res

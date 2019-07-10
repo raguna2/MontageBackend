@@ -12,10 +12,7 @@ from portraits.models.questions import Question
 import cloudinary
 from cloudinary.models import CloudinaryField
 import requests
-from requests_oauthlib import OAuth1Session
 
-API_KEY = os.environ.get('SOCIAL_AUTH_TWITTER_KEY')
-API_SECRET = os.environ.get('SOCIAL_AUTH_TWITTER_SECRET')
 USERNAME_VALID_TEXT = 'ユーザー名には半角英数、アンダースコアだけ使えます'
 USERNAME_VALIDATOR = validators.RegexValidator(r'^[a-zA-Z0-9_]+$',
                                                USERNAME_VALID_TEXT)
@@ -45,7 +42,12 @@ class MontageUserManager(BaseUserManager):
             is_staff=False,
             is_superuser=False,
         )
-        user.save(using=self._db)
+        try:
+            user.save(using=self._db)
+        except Exception as e:
+            print('create_userでエラーです')
+            print(e)
+
         self.sync_master_questions(user)
         user = self.set_user_params(user)
         return user
@@ -72,7 +74,13 @@ class MontageUserManager(BaseUserManager):
         # 画像をcloudinaryに保存
         uploaded = self.upload_profile_img(res)
         user.profile_image = uploaded['secure_url']
-        user.save(using=self._db)
+
+        try:
+            user.save(using=self._db)
+        except Exception as e:
+            print('set_user_paramsでエラーです')
+            print(e)
+
         return user
 
     def upload_profile_img(self, res):
