@@ -34,3 +34,4 @@ django-cleanup==0.1.9
 cloudinary==1.14.0
 django-cloudinary-storage==0.2.3
 Pillow==5.3.0
+python-jose==3.0.1

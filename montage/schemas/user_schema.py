@@ -1,39 +1,23 @@
-import os
-import json
-import re
-import requests
-
-from requests_oauthlib import OAuth1Session
-from urllib.parse import parse_qsl
-from PIL import Image
+import graphene
+from django.contrib.auth import get_user_model, login
+from graphene_django import DjangoObjectType
+from graphene_django.filter import DjangoFilterConnectionField
 
 from accounts.models import MontageUser
-from django.contrib.auth import get_user_model
-from django.contrib.auth import login
-
-import graphene
-from graphene_django import DjangoObjectType
-from social_django.utils import load_backend, load_strategy
-
-from graphene_django.filter import DjangoFilterConnectionField
-import graphql_jwt
-import graphql_social_auth
-
-
-API_KEY = os.environ.get('SOCIAL_AUTH_TWITTER_KEY')
-API_SECRET = os.environ.get('SOCIAL_AUTH_TWITTER_SECRET')
-
+from auth0 import get_token_auth_header, verify_payload, verify_signature
+from jose import jwt
+from portraits.models.questions import Question
+from montage.apps.logging import logger_d, logger_e
 
 
 class UserType(DjangoObjectType):
     """UserType."""
+
     # sourceと一緒に定義することでpropertyをGQLで取得できる
-    as_atsign = graphene.String(source='as_atsign')
 
     class Meta:
         """Meta."""
         model = MontageUser
-        exclude_fields = ('password')
 
 
 class UserSearchType(DjangoObjectType):
@@ -153,90 +137,57 @@ class UsersAnsweredQuestionsType(DjangoObjectType):
         interfaces = (graphene.Node, )
 
 
-class CreateAuthenticateUser(graphene.Mutation):
+class CreateAuth0User(graphene.Mutation):
     user = graphene.Field(UserType)
 
-    class Arguments:
-        username = graphene.String(required=True)
-        password = graphene.String(required=True)
+    def mutate(self, info):
+        auth_header = info.context.META.get('HTTP_AUTHORIZATION', None)
+        if auth_header:
+            id_token = get_token_auth_header(auth_header)
 
-    def mutate(self, info, username, password):
-        user = get_user_model()(
-            username=username,
-        )
-        user.set_password(password)
-        user.save()
+        payload = jwt.get_unverified_claims(id_token)
 
-        return CreateAuthenticateUser(user=user)
+        # exp, iss, audの検証
+        validated_payload = verify_payload(payload)
 
+        # signatureの検証
+        validated_sign = verify_signature(id_token)
 
-class socialAuth(graphene.Mutation):
-    """Mutation
+        if validated_payload and validated_sign:
+            # ここまで
+            user_model = get_user_model()
+            identifier_id = payload['sub']
+            display_name = payload['name']
+            username = payload['https://montage.bio/screen_name']
+            picture = payload['picture']
+            user = None
 
-    mutation{
-      twitterAuth(provider: "twitter", oauthToken: "xxx", oauthVerifier: "xxx") {
-        ok
-        user{
-          username
-        }
-      }
-    }
-    """
-    ok = graphene.Boolean()
-    user = graphene.Field(UserType)
-
-    class Arguments:
-        provider = graphene.String(required=True)
-        oauth_token = graphene.String(required=True)
-        oauth_verifier = graphene.String(required=True)
-
-    def mutate(self, info, provider, oauth_token, oauth_verifier):
-        ok = True
-        # strategyはrequestのデータやsessionの情報を扱うためのもの
-        request = info.context
-        strategy = load_strategy(request)
-        backend = load_backend(
-            strategy,
-            provider,
-            redirect_uri='/complete/twitter/'
-        )
-        consumer_key = API_KEY
-        consumer_secret = API_SECRET
-        twitter = OAuth1Session(
-            consumer_key,
-            consumer_secret,
-            oauth_token,
-            oauth_verifier,
-        )
-
-        response = twitter.post(
-            'https://api.twitter.com/oauth/access_token/',
-            params={'oauth_verifier': oauth_verifier}
-        )
-        access_token = dict(parse_qsl(response.content.decode("utf-8")))
-
-        try:
-            user = backend.do_auth(access_token)
-        except BaseException as e:
-            print(e)
-            ok = False
-
-        if user:
-            login(request, user)
+            if identifier_id and username and display_name:
+                user = user_model.objects.create_user(
+                    username=username,
+                    identifier_id=identifier_id,
+                    display_name=display_name,
+                    profile_img_url=picture,
+                )
         else:
-            ok = False
+            logger_e.error('検証に失敗')
+            user = None
 
-        return socialAuth(ok, user)
+        return CreateAuth0User(user=user)
 
 
 class Mutation(graphene.ObjectType):
-    create_user = CreateAuthenticateUser.Field()
-    twitter_auth = socialAuth.Field()
-
+    create_user = CreateAuth0User.Field()
 
 
 class Query(graphene.ObjectType):
-    user = graphene.Field(UserType, username=graphene.String())
+    user = graphene.Field(
+        UserType,
+        username=graphene.String(),
+        identifier_id=graphene.String(),
+        display_name=graphene.String(),
+        picture=graphene.String(),
+    )
     users = graphene.List(UserType)
     # ユーザ名での検索用
     searched_users = DjangoFilterConnectionField(UserSearchType)
@@ -244,7 +195,6 @@ class Query(graphene.ObjectType):
     users_unanswered_questions = DjangoFilterConnectionField(
         UsersUnansweredQuestionsType)
     me = graphene.Field(UserType)
-    request_tokens = graphene.String()
 
     def resolve_me(self, info):
         user = info.context.user
@@ -258,15 +208,3 @@ class Query(graphene.ObjectType):
 
     def resolve_users(self, info):
         return MontageUser.objects.all()
-
-    def resolve_request_tokens(self, info):
-        """twitterAPIからリクエストトークンを取得する関数"""
-        CALLBACK_URL = 'http://127.0.0.1:8080/auth/twitter/callback/'
-        twitter_api = OAuth1Session(API_KEY, API_SECRET)
-        response = twitter_api.post(
-            'https://api.twitter.com/oauth/request_token',
-            params={
-                'oauth_callback': CALLBACK_URL
-            }
-        )
-        return response.text

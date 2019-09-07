@@ -36,3 +36,7 @@ django.log
 *.xml
 *.iml
 venv
+
+# nginx
+access.log
+error.log

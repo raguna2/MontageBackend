@@ -34,10 +34,10 @@ class CreateFriendshipMutation(graphene.Mutation):
         ok
         friendship{
           relateFrom{
-            username
+            identifier_id
           }
           relateTo{
-            username
+            identifier_id
           }
         }
       }
@@ -51,10 +51,10 @@ class CreateFriendshipMutation(graphene.Mutation):
           "ok": true,
           "friendship": {
             "relateFrom": {
-              "username": "montage"
+              "identifier_id": "twitter|17000000"
             },
             "relateTo": {
-              "username": "raguna3"
+              "identifier_id": "twitter|17000001"
             }
           }
         }
@@ -141,10 +141,10 @@ class Query(graphene.ObjectType):
         edges{
           node{
             relateFrom{
-              username
+              identifier_id
             }
             relateTo{
-              username
+              identifier_id
             }
           }
         }
