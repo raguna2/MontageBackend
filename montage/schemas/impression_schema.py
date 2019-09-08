@@ -25,13 +25,27 @@ class CreateImpressionMutation(graphene.Mutation):
     IN
     ------
     mutation{
-      createImpression(userId: 1, questionId: 22, content: "質問への回答"){
+      createImpression(content: "ワロタ", username: "RAGUNA2", questionId: 11){
+        ok
         impression{
           id
-          question{
-            about
-          }
           content
+          postedAt
+        }
+      }
+    }
+
+    OUT
+    ------------
+    {
+      "data": {
+        "createImpression": {
+          "ok": true,
+          "impression": {
+            "id": "4",
+            "content": "ワロタ",
+            "postedAt": "2019-09-08T09:41:24.208806+00:00"
+          }
         }
       }
     }
@@ -41,17 +55,16 @@ class CreateImpressionMutation(graphene.Mutation):
 
     class Input:
         question_id = graphene.Int(required=True)
-        user_id = graphene.Int(required=True)
+        username = graphene.String(required=True)
         content = graphene.String(required=True)
 
-    def mutate(self, info, question_id, user_id, content):
+    def mutate(self, info, question_id, username, content):
         # イジられる側のユーザ
-        user_id = user_id
         ok = True
 
         try:
             # イジられる側のユーザを取得
-            user = MontageUser.objects.get(id=user_id)
+            user = MontageUser.objects.get(username=username)
         except ObjectDoesNotExist:
             ok = False
 
