@@ -7,10 +7,10 @@ import environ
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
 
-from .settings_secret import (DATABASE_NAME, DATABASE_USER,
-                              GOOGLE_RECAPTCHA_SECRET_KEY, SECRET_KEY,
-                              SOCIAL_AUTH_TWITTER_KEY,
-                              SOCIAL_AUTH_TWITTER_SECRET)
+from .settings_secret import (
+    DATABASE_NAME, DATABASE_USER,
+    GOOGLE_RECAPTCHA_SECRET_KEY, SECRET_KEY,
+)
 
 import cloudinary
 
@@ -60,7 +60,6 @@ STATIC_URL = '/static/'
 MEDIA_URL = "/media/"
 MEDIA_ROOT = str(BASE_DIR / 'media')
 STATIC_ROOT = str(BASE_DIR / 'static')
-SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/complete/'
 
 ROOT_URLCONF = 'montage.urls'
 WSGI_APPLICATION = 'montage.wsgi.application'
@@ -86,7 +85,6 @@ PROJECT_APPS = [
     'friendships.apps.FriendshipsConfig',
 ]
 EXTERNAL_APPS = [
-    'social_django',
     'graphene_django',
     'django_filters',
     'corsheaders',
@@ -106,7 +104,6 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'graphql_jwt.middleware.JSONWebTokenMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
@@ -115,11 +112,8 @@ MIDDLEWARE = [
 ]
 
 AUTHENTICATION_BACKENDS = [
-    'social_core.backends.twitter.TwitterOAuth',
-    'graphql_jwt.backends.JSONWebTokenBackend',
     'django.contrib.auth.backends.ModelBackend',
 ]
-SOCIAL_AUTH_POSTGRES_JSONFIELD = True
 
 ###########################
 # DATABASE
