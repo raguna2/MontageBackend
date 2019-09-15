@@ -155,37 +155,20 @@ class Query(graphene.ObjectType):
 
         Notes
         ----------
-        IN
-        query{
-          userImpressions(username: "RAGUNA2", page: 2, size: 2){
-            id
-            question{
-              id
-              about
-            }
-            content
-          }
-        }
+        クエリと取得結果はsnapshotテストを参照
 
-        OUT
-        {
-          "data": {
-            "userImpressions": [
-              {
-                "id": "4",
-                "question": {
-                  "id": "1",
-                  "about": "性別は?"
-                },
-                "content": "男"
-              },
-              ...
-            ]
-          }
-        }
         """
         user = MontageUser.objects.get(username=username)
-        user_impressions = Impression.objects.filter(user=user)
+        # 回答がすでにあるquestionを取得
+        impressed_q = Question.objects.filter(
+            user=user,
+            rev_impression__isnull=False
+        ).distinct()
+
+        # 回答がすでにある質問ごとに最新のimpressionを取得
+        all_imp = [q.rev_impression.latest('posted_at') for q in impressed_q]
+
+        # ページ番号と取得数を指定し、その数にあった分のimpressionを返す
         start = page * size if page > 0 else 0
         end = size + page * size if page > 0 else size
-        return user_impressions[start:end]
+        return all_imp[start:end]
