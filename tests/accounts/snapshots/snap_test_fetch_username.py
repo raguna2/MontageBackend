@@ -7,20 +7,33 @@ from snapshottest import Snapshot
 
 snapshots = Snapshot()
 
-snapshots['test_fetch_username 1'] = {
-    'errors': [
-        {
-            'locations': [
-                {
-                    'column': 1,
-                    'line': 1
-                }
-            ],
-            'message': '''Syntax Error GraphQL (1:1) Unexpected Name "users"
-
-1: users { username }
-   ^
-'''
-        }
-    ]
+snapshots['TestFetchUsers.test_it[user_data0] 1'] = {
+    'data': {
+        'users': [
+            {
+                'displayName': 'ユーザ1',
+                'id': '1',
+                'identifierId': 'admin|0000001',
+                'username': 'RAGUNA1'
+            },
+            {
+                'displayName': 'ユーザ2',
+                'id': '2',
+                'identifierId': 'admin|0000002',
+                'username': 'RAGUNA2'
+            },
+            {
+                'displayName': 'ユーザ3',
+                'id': '3',
+                'identifierId': 'admin|0000003',
+                'username': 'RAGUNA3'
+            },
+            {
+                'displayName': 'ユーザ4',
+                'id': '4',
+                'identifierId': 'admin|0000004',
+                'username': 'RAGUNA4'
+            }
+        ]
+    }
 }
