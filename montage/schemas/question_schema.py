@@ -119,7 +119,10 @@ class Query(graphene.ObjectType):
         """
         category_questions = Question.objects.filter(
             user__pk=user_id,
-            category__name=category_name)
+            category__name=category_name,
+            rev_impression__isnull=True,
+        )
+
         start = page * size if page > 0 else 0
         end = size + page * size if page > 0 else size
         return category_questions[start:end]
