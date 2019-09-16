@@ -16,10 +16,10 @@ snapshots['TestResolveUserImpressions.test_it 1'] = {
                 'question': {
                     'about': '5?',
                     'category': {
-                        'id': 'Q2F0ZWdvcnlOb2RlOjI=',
+                        'id': 'Q2F0ZWdvcnlOb2RlOjM=',
                         'name': 'サンプルカテゴリ'
                     },
-                    'id': '10'
+                    'id': '11'
                 }
             },
             {
@@ -28,10 +28,10 @@ snapshots['TestResolveUserImpressions.test_it 1'] = {
                 'question': {
                     'about': '3?',
                     'category': {
-                        'id': 'Q2F0ZWdvcnlOb2RlOjI=',
+                        'id': 'Q2F0ZWdvcnlOb2RlOjM=',
                         'name': 'サンプルカテゴリ'
                     },
-                    'id': '8'
+                    'id': '9'
                 }
             },
             {
@@ -40,10 +40,10 @@ snapshots['TestResolveUserImpressions.test_it 1'] = {
                 'question': {
                     'about': '1?',
                     'category': {
-                        'id': 'Q2F0ZWdvcnlOb2RlOjI=',
+                        'id': 'Q2F0ZWdvcnlOb2RlOjM=',
                         'name': 'サンプルカテゴリ'
                     },
-                    'id': '6'
+                    'id': '7'
                 }
             }
         ]

@@ -12,11 +12,11 @@ snapshots['TestResolveCategoryQuestions.test_it 1'] = {
         'categoryQuestions': [
             {
                 'about': 'この質問は表示されます2',
-                'id': '5'
+                'id': '6'
             },
             {
                 'about': 'この質問は表示されます1',
-                'id': '4'
+                'id': '5'
             }
         ]
     }
