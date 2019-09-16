@@ -1,15 +1,12 @@
 import logging
 
-from django.core.exceptions import ObjectDoesNotExist
-
-from accounts.models import MontageUser
-from friendships.models import Friendship
-from categories.models import Category
-
 import graphene
+from django.core.exceptions import ObjectDoesNotExist
 from graphene_django import DjangoObjectType
 from graphene_django.filter import DjangoFilterConnectionField
-
+from accounts.models import MontageUser
+from categories.models import Category
+from friendships.models import Friendship
 
 logger = logging.getLogger(__name__)
 
