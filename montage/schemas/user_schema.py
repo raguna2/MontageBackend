@@ -1,3 +1,5 @@
+import logging
+
 import graphene
 from django.contrib.auth import get_user_model, login
 from graphene_django import DjangoObjectType
@@ -7,7 +9,9 @@ from accounts.models import MontageUser
 from auth0 import get_token_auth_header, verify_payload, verify_signature
 from jose import jwt
 from portraits.models.questions import Question
-from montage.apps.logging import logger_d, logger_e
+
+
+logger = logging.getLogger(__name__)
 
 
 class UserType(DjangoObjectType):
@@ -141,6 +145,7 @@ class CreateAuth0User(graphene.Mutation):
     user = graphene.Field(UserType)
 
     def mutate(self, info):
+        logger.info('create user mutation is start')
         auth_header = info.context.META.get('HTTP_AUTHORIZATION', None)
         if auth_header:
             id_token = get_token_auth_header(auth_header)
@@ -154,8 +159,8 @@ class CreateAuth0User(graphene.Mutation):
         validated_sign = verify_signature(id_token)
 
         if validated_payload and validated_sign:
-            # ここまで
             user_model = get_user_model()
+            logger.info('get payload params')
             identifier_id = payload['sub']
             display_name = payload['name']
             username = payload['https://montage.bio/screen_name']
@@ -169,8 +174,9 @@ class CreateAuth0User(graphene.Mutation):
                     display_name=display_name,
                     profile_img_url=picture,
                 )
+                logger.info('created user object')
         else:
-            logger_e.error('検証に失敗')
+            logger.error('検証に失敗')
             user = None
 
         return CreateAuth0User(user=user)
@@ -194,14 +200,6 @@ class Query(graphene.ObjectType):
     # 未回答質問取得用
     users_unanswered_questions = DjangoFilterConnectionField(
         UsersUnansweredQuestionsType)
-    me = graphene.Field(UserType)
-
-    def resolve_me(self, info):
-        user = info.context.user
-        if user.is_anonymous:
-            raise Exception('Not logged!')
-
-        return user
 
     def resolve_user(self, info, username):
         return MontageUser.objects.get(username=username)

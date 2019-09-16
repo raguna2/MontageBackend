@@ -1,3 +1,5 @@
+import logging
+
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator
 
@@ -8,6 +10,9 @@ from portraits.models.impressions import Impression
 import graphene
 from graphene_django import DjangoObjectType
 from graphene_django.filter import DjangoFilterConnectionField
+
+
+logger = logging.getLogger(__name__)
 
 
 class ImpressionType(DjangoObjectType):
@@ -59,13 +64,12 @@ class CreateImpressionMutation(graphene.Mutation):
         content = graphene.String(required=True)
 
     def mutate(self, info, question_id, username, content):
-        # イジられる側のユーザ
         ok = True
 
         try:
-            # イジられる側のユーザを取得
             user = MontageUser.objects.get(username=username)
-        except ObjectDoesNotExist:
+        except ObjectDoesNotExist as e:
+            logger.error(e)
             ok = False
 
         question = Question.objects.get(id=question_id, user=user)
@@ -107,7 +111,8 @@ class DeleteImpressionMutation(graphene.Mutation):
         try:
             Impression.objects.filter(id=id).delete()
             ok = True
-        except ObjectDoesNotExist:
+        except ObjectDoesNotExist as e:
+            logger.error(e)
             ok = False
 
         return DeleteImpressionMutation(id=id, ok=ok)

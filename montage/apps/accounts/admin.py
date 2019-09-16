@@ -1,6 +1,4 @@
 from django.contrib import admin
-from . import models
-
 from accounts.models import MontageUser
 
 
@@ -40,5 +38,6 @@ class MontageUserAdmin(admin.ModelAdmin):
     ordering = ('identifier_id', )
     # manytomanyを一括で横に追加削除できる
     filter_horizontal = ()
+
 
 admin.site.register(MontageUser, MontageUserAdmin)

@@ -1,16 +1,19 @@
 from os import environ
+import logging
 
 # Heroku
 import django_heroku
 
-from montage.apps.logging import logger_d, logger_e
+
+logger = logging.getLogger(__name__)
 
 try:
-    logger_d.info('prodを読み込んでいます')
+    logger.info('prodを読み込んでいます')
     from .common import *
-    logger_d.info('prodとcommonが読み込まれました')
-except ImportError:
-    logger_e.error('/settings/common.pyがうまくインポート出来ていません')
+    logger.info('prodとcommonが読み込まれました')
+except ImportError as e:
+    logger.error('/settings/common.pyがうまくインポート出来ていません')
+    logger.error(e)
 
 # ここは本番用のみに適用される
 # herokuの設定,S3の設定,

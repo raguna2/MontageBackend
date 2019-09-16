@@ -1,5 +1,4 @@
 from django.db import models
-
 from montage.settings.common import AUTH_USER_MODEL
 
 
