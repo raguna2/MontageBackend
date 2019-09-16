@@ -1,19 +1,20 @@
 import json
+import logging
 import os
 from pathlib import Path
 
-import cloudinary
 from django.contrib.auth.models import (AbstractBaseUser, BaseUserManager,
                                         PermissionsMixin)
 from django.core import validators
 from django.db import models
 
+import cloudinary
 import requests
-from montage.apps.logging import logger_d, logger_e
 from portraits.models.questions import Question
 
 USERNAME_VALID_TEXT = 'ユーザー名には半角英数、アンダースコアだけ使えます'
 USERNAME_VALIDATOR = validators.RegexValidator(r'^[a-zA-Z0-9_]+$', USERNAME_VALID_TEXT)
+logger = logging.getLogger(__name__)
 
 
 class MontageUserManager(BaseUserManager):
@@ -22,7 +23,7 @@ class MontageUserManager(BaseUserManager):
     def _create_user(self, username, identifier_id, password, is_staff, is_superuser,
                      **extra_fields):
         """通常ログインor Adminからのユーザ作成処理"""
-        logger_d.info('通常ログインor Adminからのユーザ作成処理')
+        logger.info('通常ログインor Adminからのユーザ作成処理')
         if not username:
             raise ValueError('The given username must be set')
 
@@ -38,7 +39,7 @@ class MontageUserManager(BaseUserManager):
 
     def create_user(self, username, identifier_id, display_name, profile_img_url=None):
         """Twitter認証時のユーザ作成処理"""
-        logger_d.info('Twitter認証時のユーザ作成処理')
+        logger.info('Twitter認証時のユーザ作成処理')
         if not profile_img_url:
             profile_img_url = ''
         user = self.model(
@@ -53,8 +54,8 @@ class MontageUserManager(BaseUserManager):
         try:
             user.save(using=self._db)
         except Exception as e:
-            logger_e.error('create_userでエラーです')
-            logger_e.error(e)
+            logger.error('create_userでエラーです')
+            logger.error(e)
 
         self.sync_master_questions(user)
         return user
@@ -64,16 +65,20 @@ class MontageUserManager(BaseUserManager):
         master_questions = Question.objects.filter(is_personal=False)
 
         # マスタ質問と作成するユーザを紐付ける
+        logger.info('start master question relation...')
         for q in master_questions:
             q.user.add(user)
             q.save()
+        logger.info('end master question relation...')
 
     def set_picture(self, user, picture):
         # 画像をcloudinaryに保存
         uploaded = self.upload_profile_img(picture)
+        logger.info('upload is success')
 
         if uploaded:
             user.profile_img_url = uploaded['secure_url']
+            logger.info('get secure_url from uploaded data')
         else:
             user.profile_img_url = None
 
@@ -114,13 +119,16 @@ class MontageUserManager(BaseUserManager):
 
         response = requests.get(image_url_square, stream=True)
         if response.status_code == 200:
+            logger.info('fetching 400px image is sucess')
+            # TODO: herokuに環境変数を追加する
             folder = os.environ.get('CLOUDINARY_UPLOAD_FOLDER')
             uploaded = cloudinary.uploader.upload(
                 response.content,
                 folder=folder,
             )
+            logger.info('upload cloudinary is success')
         else:
-            logger_e.error('プロフィール画像取得のレスポンスコードが200ではありません.')
+            logger.error('プロフィール画像取得のレスポンスコードが200ではありません.')
 
         return uploaded
 

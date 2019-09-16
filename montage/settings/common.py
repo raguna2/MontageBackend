@@ -163,57 +163,27 @@ USE_TZ = True
 ###########################
 # LOGGING
 ###########################
-# see: https://qiita.com/tnnsst35/items/c7d8705cb412e7869d47
 LOGGING = {
     'version': 1,
-    'disable_existing_loggers': True,
+    'disable_existing_loggers': False,
     'formatters': {
         'verbose': {
-            'format':
-            f'[*%(levelname)s*] %(asctime)s\t場所:%(pathname)s/%(filename)s\n'
-            f'処理が止まった場所:%(funcName)sの%(lineno)d行目\n'
-            f'エラーメッセージ:%(message)s'
-        },
-        'log_filing': {
-            'format':
-            f'%(levelname)s\t%(asctime)s\t%(pathname)s\t%(filename)s\t'
-            f'%(funcName)s\t%(lineno)d\t%(message)s'
-        },
-        'simple': {
-            'format': '%(levelname)s\t%(message)s'
+            'format': '[%(asctime)s][%(processName)s(%(process)d)][%(name)s][L%(lineno)d][%(levelname)s] %(message)s',  # NOQA
+            'datefmt': '%Y-%m-%d %H:%M:%S %z',
         },
     },
     'handlers': {
-        'null': {
-            'level': 'DEBUG',
-            'class': 'logging.NullHandler',
-            'formatter': 'simple'
-        },
         'console': {
-            'level': 'DEBUG',
+            'level': 'INFO',
+            'formatter': 'verbose',
             'class': 'logging.StreamHandler',
-            'formatter': 'verbose'
         },
-        'logfile': {
-            'level': 'ERROR',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': str(BASE_DIR / 'django.log'),
-            'maxBytes': 1024 * 1024 * 5,  # 5MB
-            'backupCount': 0,
-            'formatter': 'log_filing',
-        }
     },
     'loggers': {
-        'django_debug': {
-            'handlers': ['null', 'console'],
-            'propagate': True,
-            'level': 'DEBUG',
-        },
-        'error_handling': {
-            'handlers': ['console', 'logfile'],
-            'level': 'ERROR',
-            'propagate': False
-        },
+        '': {
+            'handlers': ['console'],
+            'level': 'INFO',
+        }
     }
 }
 ###########################

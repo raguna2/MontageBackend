@@ -1,8 +1,11 @@
 #!/usr/bin/env python
 import os
 import sys
+import logging
 
-from montage.apps.logging import logger_e
+
+logger = logging.getLogger(__name__)
+
 
 if __name__ == "__main__":
     # /montage/settings/dev.pyを設定ファイルにする設定
@@ -10,7 +13,7 @@ if __name__ == "__main__":
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:
-        logger_e.error('インポートエラーです')
+        logger.error('インポートエラーです')
         raise ImportError(
             "インポートエラーです"
         ) from exc

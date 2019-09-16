@@ -1,15 +1,17 @@
-from django.core.exceptions import ObjectDoesNotExist
-
-from accounts.models import MontageUser
-from portraits.models.questions import Question
-from portraits.models.impressions import Impression
-from categories.models import Category
-from .user_schema import UserType
+import logging
 
 import graphene
+from django.core.exceptions import ObjectDoesNotExist
 from graphene_django import DjangoObjectType
 
-from montage.apps.logging import logger_e
+from accounts.models import MontageUser
+from categories.models import Category
+from portraits.models.impressions import Impression
+from portraits.models.questions import Question
+
+from .user_schema import UserType
+
+logger = logging.getLogger(__name__)
 
 
 class QuestionType(DjangoObjectType):
@@ -66,8 +68,9 @@ class DeleteQuestionMutation(graphene.Mutation):
         try:
             question.delete()
             ok = True
-        except ObjectDoesNotExist:
-            logger_e.error('存在しないオブジェクトは削除できません')
+        except ObjectDoesNotExist as e:
+            logger.error('存在しないオブジェクトは削除できません')
+            logger.error(e)
 
         return DeleteQuestionMutation(ok=ok)
 
@@ -90,31 +93,9 @@ class Query(graphene.ObjectType):
     def resolve_category_questions(self, info, user_id, category_name, page, size):
         """ユーザのカテゴリごとの質問(未回答のみ)
 
-        IN
-        ---------
-        query{
-          categoryQuestions(userId: 32, categoryName: "あなたについて", page: 0, size: 2){
-            about
-          }
-        }
-
-        OUT
-        --------
-        {
-          "data": {
-            "categoryQuestions": [
-              {
-                "about": "aaaaaaaaaaaaa"
-              },
-              {
-                "about": "趣味は?"
-              },
-              {
-                "about": "座右の銘は?"
-              }
-            ]
-          }
-        }
+        Notes
+        -----------------
+        入出力値についてはsnapshotを参照
 
         """
         category_questions = Question.objects.filter(

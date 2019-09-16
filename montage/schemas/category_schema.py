@@ -1,17 +1,19 @@
-from django.core.exceptions import ObjectDoesNotExist
-
-from accounts.models import MontageUser
-from portraits.models.questions import Question
-from portraits.models.impressions import Impression
-from categories.models import Category
-from django.forms import ModelForm
-from django.forms import ValidationError
+import logging
 
 import graphene
+from django.core.exceptions import ObjectDoesNotExist
+from django.forms import ModelForm, ValidationError
 from graphene_django import DjangoObjectType
 from graphene_django.filter import DjangoFilterConnectionField
-from graphene_django.forms.mutation import DjangoModelFormMutation
-from graphene_django.forms.mutation import DjangoFormMutation
+from graphene_django.forms.mutation import (DjangoFormMutation,
+                                            DjangoModelFormMutation)
+
+from accounts.models import MontageUser
+from categories.models import Category
+from portraits.models.impressions import Impression
+from portraits.models.questions import Question
+
+logger = logging.getLogger(__name__)
 
 
 class CreateCategoryForm(ModelForm):
@@ -50,7 +52,8 @@ class CreateCategoryRelay(graphene.relay.ClientIDMutation):
             cat = Category.objects.create(
                 name=input.get('name'), description=input.get('description'))
             cat.save()
-        except ObjectDoesNotExist:
+        except ObjectDoesNotExist as e:
+            logger.error(e)
             ok = False
 
         return CreateCategoryRelay(category=cat, ok=ok)

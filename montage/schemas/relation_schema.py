@@ -1,14 +1,15 @@
-from django.core.exceptions import ObjectDoesNotExist
-
-from accounts.models import MontageUser
-from relationships.models import Relationship
-from categories.models import Category
+import logging
 
 import graphene
+from django.core.exceptions import ObjectDoesNotExist
 from graphene_django import DjangoObjectType
 from graphene_django.filter import DjangoFilterConnectionField
 
-from montage.apps.logging import logger_e
+from accounts.models import MontageUser
+from categories.models import Category
+from relationships.models import Relationship
+
+logger = logging.getLogger(__name__)
 
 
 class RelationshipType(DjangoObjectType):
@@ -92,7 +93,9 @@ class CreateRelationshipMutation(graphene.Mutation):
             )
             relation.save()
             ok = True
-        except ObjectDoesNotExist:
+        except ObjectDoesNotExist as e:
+            logger.error('Relationshipの作成に失敗しました')
+            logger.error(e)
             ok = False
 
         return CreateRelationshipMutation(relation=relation, ok=ok)
@@ -130,8 +133,9 @@ class DeleteRelationshipMutation(graphene.Mutation):
         try:
             relation.delete()
             ok = True
-        except ObjectDoesNotExist:
-            logger_e.error('存在しないオブジェクトは削除できません')
+        except ObjectDoesNotExist as e:
+            logger.error('存在しないオブジェクトは削除できません')
+            logger.error(e)
             ok = False
 
         return DeleteRelationshipMutation(ok=ok)

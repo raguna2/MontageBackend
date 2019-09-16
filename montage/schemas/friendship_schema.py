@@ -1,3 +1,5 @@
+import logging
+
 from django.core.exceptions import ObjectDoesNotExist
 
 from accounts.models import MontageUser
@@ -8,7 +10,8 @@ import graphene
 from graphene_django import DjangoObjectType
 from graphene_django.filter import DjangoFilterConnectionField
 
-from montage.apps.logging import logger_e
+
+logger = logging.getLogger(__name__)
 
 
 class FriendshipType(DjangoObjectType):
@@ -70,6 +73,7 @@ class CreateFriendshipMutation(graphene.Mutation):
     def mutate(self, info, **input):
 
         if info.context.user.is_anonymous:
+            logger.error('ユーザがanonymousです.')
             raise Exception('Not logged!')
 
         try:
@@ -80,7 +84,8 @@ class CreateFriendshipMutation(graphene.Mutation):
                 relate_from=info.context.user, relate_to=relate_to)
             friendship.save()
             ok = True
-        except ObjectDoesNotExist:
+        except ObjectDoesNotExist as e:
+            logger.error(e)
             ok = False
 
         return CreateFriendshipMutation(friendship=friendship, ok=ok)
@@ -118,8 +123,9 @@ class DeleteFriendshipMutation(graphene.Mutation):
         try:
             friendship.delete()
             ok = True
-        except ObjectDoesNotExist:
-            logger_e.error('存在しないオブジェクトは削除できません')
+        except ObjectDoesNotExist as e:
+            logger.error('存在しないオブジェクトは削除できません')
+            logger.error(e)
             ok = False
 
         return DeleteFriendshipMutation(ok=ok)

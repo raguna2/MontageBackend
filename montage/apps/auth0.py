@@ -1,6 +1,6 @@
 import json
+import logging
 
-from montage.apps.logging import logger_d, logger_e
 from django.core.cache import cache
 from django.utils import timezone
 
@@ -12,16 +12,15 @@ from jose.backends.rsa_backend import RSAKey
 AUTH0_DOMAIN = "montage.auth0.com"
 API_IDENTIFIER = "RGVd2YKMt0igpii0SWSGPmYV2MiPtT7Z"
 ALGORITHMS = ["RS256"]
+# TODO: envファイルに格納
+
+logger = logging.getLogger(__name__)
 
 
 class AuthError(Exception):
     def __init__(self, error, status_code):
         self.error = error
         self.status_code = status_code
-
-
-class Auth0Error(Exception):
-    pass
 
 
 def get_token_auth_header(auth_token):
@@ -37,6 +36,7 @@ def get_token_auth_header(auth_token):
 
     3. Bearer[スペース:トークン[スペース]他の文字列 形式になっている
     """
+    logger.info('validate auth_token')
     parts = auth_token.split()
 
     if parts[0].lower() != "bearer":
@@ -58,6 +58,7 @@ def get_token_auth_header(auth_token):
                 "description": "Authorization header must be"
                 " Bearer token"
             }, 401)
+    logger.info('verified success!')
 
     id_token = parts[1]
     return id_token
@@ -65,14 +66,15 @@ def get_token_auth_header(auth_token):
 
 def verify_payload(payload):
     # 有効期限チェック
+    logger.info('verify payload')
     if timezone.now().timestamp() > payload['exp']:
-        logger_e.error('Expired token.')
+        logger.error('Expired token.')
         raise AuthError({
             "code": "Expired token!",
             "description": "Expired token!"
         }, 401)
 
-    logger_d.debug('exp の有効期限は問題なし')
+    logger.debug('exp の有効期限は問題なし')
 
     if not payload['iss'] == f"https://{AUTH0_DOMAIN}/":
         raise AuthError({
@@ -92,23 +94,29 @@ def verify_payload(payload):
 def get_json_web_keys():
     """JWKを取得する"""
     # キャッシュから取得
+    logger.info('get JWK')
     jwks = cache.get('auth0_jwk')
 
     if jwks:
-        logger_d.debug('cacheのjwkを利用します.')
+        logger.info('cacheのjwkを利用します.')
         return jwks
 
     # キャッシュになければ取得する
     url = f"https://{AUTH0_DOMAIN}/.well-known/jwks.json"
     response = requests.get(url)
     if response.status_code != 200:
-        logger_e.error('jwkが取得できませんでした')
-        raise Auth0Error(f"Not found JWK {url}")
+        logger.error('jwkが取得できませんでした')
+        raise AuthError(
+            {
+                "code": "jwk_not_found",
+                "description": f"JWK is NOT FOUND from {url}"
+            }, 401)
 
     jwks = json.loads(response.text)['keys']
 
     # 1時間キャッシュする
     cache.set('auth0_jwk', jwks, 3600)
+    logger.info('JWK was cached!')
 
     return jwks
 
@@ -120,7 +128,7 @@ def get_public_key(id_token):
         # JWTをデコードする
         unverified_header = jwt.get_unverified_header(id_token)
     except jwt.JWTError as e:
-        logger_e.error(e)
+        logger.error(e)
         raise AuthError({
             "code":
             "invalid_header",
@@ -150,14 +158,19 @@ def get_public_key(id_token):
 
     # 公開鍵のセットから該当のkidが見つからなかった場合の処理
     if key_index == -1:
-        logger_e.error('kidがみつかりません')
-        raise Auth0Error('Not found kid in keys: {}'.format(kid))
+        logger.error('kidがみつかりません')
+        raise AuthError(
+            {
+                "code": "kid_not_found",
+                "description": "kid is Not found in keys: {}".format(kid)
+            }, 401)
 
     # 公開鍵を取得
     return jwk.construct(jwks[key_index])
 
 
 def verify_signature(id_token):
+    logger.info('verify signature')
     # 署名を検証する
     public_key: RSAKey = get_public_key(id_token)  # 公開鍵を取得
     message, signature = id_token.rsplit('.', 1)
@@ -165,7 +178,10 @@ def verify_signature(id_token):
 
     # 公開鍵
     if not public_key.verify(message.encode('utf-8'), decoded_signature):
-        logger_e.error('Invalid token')
-        raise Auth0Error('Invalid token')
+        logger.error('Invalid token')
+        raise AuthError({
+            "code": "invalid_token",
+            "description": "Token is invalid"
+        }, 401)
 
     return True
