@@ -27,33 +27,10 @@ class CreateImpressionMutation(graphene.Mutation):
     """
     Impressionの作成
 
-    IN
-    ------
-    mutation{
-      createImpression(content: "ワロタ", username: "RAGUNA2", questionId: 11){
-        ok
-        impression{
-          id
-          content
-          postedAt
-        }
-      }
-    }
+    Notes
+    ---------------
+    入出力仕様はsnapshotテストを参考
 
-    OUT
-    ------------
-    {
-      "data": {
-        "createImpression": {
-          "ok": true,
-          "impression": {
-            "id": "4",
-            "content": "ワロタ",
-            "postedAt": "2019-09-08T09:41:24.208806+00:00"
-          }
-        }
-      }
-    }
     """
     impression = graphene.Field(ImpressionType)
     ok = graphene.Boolean()
@@ -69,6 +46,7 @@ class CreateImpressionMutation(graphene.Mutation):
         try:
             user = MontageUser.objects.get(username=username)
         except ObjectDoesNotExist as e:
+            logger.error('hoge')
             logger.error(e)
             ok = False
 
