@@ -16,7 +16,7 @@ class TestMainView:
     )
     def test_it(self, target, url, expected):
         # arrange
-        from .factories import MontageUserFactory
+        from ..factories import MontageUserFactory
         MontageUserFactory()
 
         # act
