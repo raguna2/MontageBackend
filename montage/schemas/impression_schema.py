@@ -144,7 +144,7 @@ class Query(graphene.ObjectType):
         user = MontageUser.objects.get(username=username)
         # 回答がすでにあるquestionを取得
         impressed_q = Question.objects.filter(
-            user=user,
+            rev_impression__user=user,
             rev_impression__isnull=False
         ).distinct()
 
