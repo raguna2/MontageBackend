@@ -5,14 +5,12 @@ from accounts.models import MontageUser
 class MontageUserAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {
-            'fields': ('identifier_id', 'display_name', 'username'
-                       'date_of_birth', 'profile_img_url',
-                       ('first_name', 'last_name')
-                       )
+            'fields': ('identifier_id', 'display_name', 'username',
+                       'profile_img_url')
         }),
         ('Advanced options', {
             'classes': ('collapse', ),
-            'fields': ('is_staff', 'is_superuser', 'is_active'),
+            'fields': ('is_staff', 'is_superuser'),
         }),
     )
     add_fieldsets = ((None, {
@@ -24,10 +22,7 @@ class MontageUserAdmin(admin.ModelAdmin):
         'identifier_id',
         'username',
         'display_name',
-        'is_staff',
         'is_superuser',
-        'date_of_birth',
-        'is_active',
         'created_date',
         'modified_date',
     )
