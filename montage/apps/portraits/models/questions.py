@@ -47,7 +47,7 @@ class Question(models.Model):
                   ユーザが独自に作成したものであればTrue,
                   運営が作成したものならFalse
                   """,
-        default=True)
+        default=False)
 
     def __str__(self):
         """printされたときはaboutを返す"""
