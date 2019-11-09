@@ -1,4 +1,7 @@
+import os
+import json
 import logging
+import http.client
 
 import graphene
 from django.contrib.auth import get_user_model, login
@@ -10,7 +13,8 @@ from auth0 import get_token_auth_header, verify_payload, verify_signature
 from jose import jwt
 from portraits.models.questions import Question
 
-
+MGT_CLIENT_ID = os.environ.get('MGT_CLIENT_ID')
+MGT_CLIENT_ID_SECRET = os.environ.get('MGT_CLIENT_ID_SECRET')
 logger = logging.getLogger(__name__)
 
 
@@ -182,8 +186,36 @@ class CreateAuth0User(graphene.Mutation):
         return CreateAuth0User(user=user)
 
 
+class DeleteMontageUserMutation(graphene.Mutation):
+    """
+    MontageUserの削除
+    """
+    ok = graphene.Boolean()
+
+    class Arguments:
+        username = graphene.String()
+
+    def mutate(self, info, username):
+        target = MontageUser.objects.get(username=username)
+        is_successed = delete_auth0_user(target.identifier_id)
+
+        if is_successed:
+            try:
+                target.delete()
+                ok = True
+            except MontageUser.DoesNotExist as e:
+                logger.error(e)
+                logger.error('存在しないユーザは削除できません')
+
+            logger.info('Djangoデータベースからユーザは削除されました')
+        else:
+            ok = False
+        return DeleteMontageUserMutation(ok=ok)
+
+
 class Mutation(graphene.ObjectType):
     create_user = CreateAuth0User.Field()
+    delete_user = DeleteMontageUserMutation.Field()
 
 
 class Query(graphene.ObjectType):
@@ -206,3 +238,74 @@ class Query(graphene.ObjectType):
 
     def resolve_users(self, info):
         return MontageUser.objects.all()
+
+
+def delete_auth0_user(identifier_id: str) -> bool:
+    """Auth0のユーザ削除処理
+
+    Parameters
+    -------------------
+    indentifier_id: str
+        Twitterのユーザ識別ID
+
+    Returns
+    ---------------
+    bool:
+        削除が成功したかを表す真偽値
+
+
+    Notes
+    ----------------------
+    1. 環境変数からAuth0のマネジメントAPIのアクセストークンを取得するためのID,ID_SECRETを取得
+
+    2. payloadに1で取得したものを含めてアクセストークンを取得(/oauth/token)
+
+    3. 取得したアクセストークンをapiheaderに入れて、`/api/v2/users/{identifier_id}`へ削除処理を投げる
+
+    4. 成功したら、Trueを返す。途中で失敗したら、Falseを返す
+
+    TODOS
+    --------------------
+    herokuにMGT_CLIENT_ID, MGT_CLIENT_ID_SECRETの環境変数を追加
+
+    """
+
+    # fetch access token for management API
+    conn = http.client.HTTPSConnection("montage.auth0.com")
+    payload = {
+        "client_id": MGT_CLIENT_ID,
+        "client_secret": MGT_CLIENT_ID_SECRET,
+        "audience": "https://montage.auth0.com/api/v2/",
+        "grant_type": "client_credentials",
+    }
+    logger.info('fetch access token for management API')
+    conn.request(
+        "POST",
+        "/oauth/token",
+        json.dumps(payload),
+        {'content-type': "application/json"}
+    )
+    logger.info('success fetch access token for management API')
+
+    data = json.loads(conn.getresponse().read().decode("utf-8"))
+    if 'access_token' not in data.keys():
+        logger.error("fail to fetch access token")
+        return False
+
+    manage_access_token = data['access_token']
+
+    # access management API and delete Auth0 User
+    apiheaders = {'authorization': f"Bearer {manage_access_token}"}
+
+    logger.info('delete auth0 user with management API')
+    conn.request("DELETE", f"/api/v2/users/{identifier_id}", headers=apiheaders)
+    response = conn.getresponse()
+
+    # 物理削除なので200ではなく204
+    if response.status != 204:
+        logger.error('Auth0ユーザの削除リクエストに失敗しました.')
+        return False
+
+    logger.info('Auth0のDBからユーザの削除が完了しました.')
+
+    return True

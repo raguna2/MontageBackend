@@ -141,7 +141,7 @@ class MontageUser(AbstractBaseUser, PermissionsMixin):
     objects = MontageUserManager()
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS =['identifier_id']
-    # 下記に記載したものがcreatesuperuser実行時に効かれる
+    # 下記に記載したものがcreatesuperuser実行時に聞かれる
     username = models.CharField(
         'ユーザ名',
         max_length=30,
@@ -172,14 +172,6 @@ class MontageUser(AbstractBaseUser, PermissionsMixin):
             'max': "名前が長すぎます"
         },
     )
-    date_of_birth = models.DateField(
-        '誕生日', help_text='%yy-%MM-%dd形式.空白可', null=True, blank=True)
-    first_name = models.CharField(
-        '名字', help_text='first_name', max_length=30, default='', blank=True)
-    last_name = models.CharField(
-        '下の名前', help_text='last_name', max_length=30, default='', blank=True)
-    is_active = models.BooleanField(
-        '退会していないか?', help_text='is_active', default=True)
     created_date = models.DateTimeField(
         '登録日時', help_text='created_date', auto_now_add=True)
     modified_date = models.DateTimeField(
