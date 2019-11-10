@@ -6,7 +6,7 @@ from django.urls import include, path
 from django.views.decorators.csrf import csrf_exempt
 from graphene_django.views import GraphQLView
 
-from montage.settings.common import DEBUG, MEDIA_ROOT, MEDIA_URL
+from montage.settings import common
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -15,4 +15,6 @@ urlpatterns = [
     path('gql/', csrf_exempt(GraphQLView.as_view(graphiql=True))),
 ]
 
-urlpatterns += static(MEDIA_URL, document_root=MEDIA_ROOT)
+if not common.DEBUG:
+    urlpatterns += static(common.MEDIA_URL, document_root=common.MEDIA_ROOT)
+    urlpatterns += static(common.STATIC_URL, document_root=common.STATIC_ROOT)

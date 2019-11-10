@@ -2,6 +2,7 @@
 dive.log
 .env
 venv
+montage/staticfiles/
 
 # Python bytecode:
 *.py[co]

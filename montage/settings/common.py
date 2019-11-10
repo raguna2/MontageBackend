@@ -53,7 +53,7 @@ TEMPLATES = [
 STATIC_URL = '/static/'
 MEDIA_URL = "/media/"
 MEDIA_ROOT = str(BASE_DIR / 'media')
-STATIC_ROOT = str(BASE_DIR / 'static')
+STATIC_ROOT = str(BASE_DIR / 'staticfiles')
 
 ROOT_URLCONF = 'montage.urls'
 WSGI_APPLICATION = 'montage.wsgi.application'
@@ -108,6 +108,7 @@ MIDDLEWARE = [
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
 ]
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 ###########################
 # DATABASE
@@ -168,7 +169,7 @@ LOGGING = {
     },
     'handlers': {
         'console': {
-            'level': 'INFO',
+            'level': 'DEBUG',
             'formatter': 'verbose',
             'class': 'logging.StreamHandler',
         },
@@ -176,7 +177,7 @@ LOGGING = {
     'loggers': {
         '': {
             'handlers': ['console'],
-            'level': 'INFO',
+            'level': 'DEBUG',
         }
     }
 }
