@@ -4,15 +4,10 @@ from pathlib import Path
 
 import environ
 
-import sentry_sdk
+import cloudinary
 from sentry_sdk.integrations.django import DjangoIntegration
 
-from .settings_secret import (
-    DATABASE_NAME, DATABASE_USER,
-    GOOGLE_RECAPTCHA_SECRET_KEY, SECRET_KEY,
-)
-
-import cloudinary
+from .settings_secret import DATABASE_NAME, DATABASE_USER, SECRET_KEY
 
 # 開発環境のホスト名をhostnameに入力し、
 # see: https://mmmmemo.com/20180615_python_django_02/
@@ -186,12 +181,6 @@ LOGGING = {
         }
     }
 }
-###########################
-# Sentry
-###########################
-sentry_sdk.init(
-    dsn="https://de580293695e4353893fdd2f499fd65e@sentry.io/1291134",
-    integrations=[DjangoIntegration()])
 
 ###########################
 # Cloudinary
