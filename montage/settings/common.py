@@ -5,7 +5,6 @@ from pathlib import Path
 import environ
 
 import cloudinary
-from sentry_sdk.integrations.django import DjangoIntegration
 
 from .settings_secret import DATABASE_NAME, DATABASE_USER, SECRET_KEY
 
