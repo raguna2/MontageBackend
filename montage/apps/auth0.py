@@ -1,3 +1,4 @@
+import os
 import json
 import logging
 
@@ -10,9 +11,8 @@ from jose.utils import base64url_decode
 from jose.backends.rsa_backend import RSAKey
 
 AUTH0_DOMAIN = "montage.auth0.com"
-API_IDENTIFIER = "RGVd2YKMt0igpii0SWSGPmYV2MiPtT7Z"
+API_IDENTIFIER = os.environ.get('AUTH0_API_IDENTIFIER')
 ALGORITHMS = ["RS256"]
-# TODO: envファイルに格納
 
 logger = logging.getLogger(__name__)
 
