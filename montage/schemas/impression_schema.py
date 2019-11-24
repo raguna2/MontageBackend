@@ -141,7 +141,12 @@ class Query(graphene.ObjectType):
         クエリと取得結果はsnapshotテストを参照
 
         """
-        user = MontageUser.objects.get(username=username)
+        try:
+            user = MontageUser.objects.get(username=username)
+        except MontageUser.DoesNotExist as e:
+            logger.error(e)
+            return None
+
         # 回答がすでにあるquestionを取得
         impressed_q = Question.objects.filter(
             rev_impression__user=user,
