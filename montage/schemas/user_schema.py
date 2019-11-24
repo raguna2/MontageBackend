@@ -196,7 +196,13 @@ class DeleteMontageUserMutation(graphene.Mutation):
         username = graphene.String()
 
     def mutate(self, info, username):
-        target = MontageUser.objects.get(username=username)
+
+        try:
+            target = MontageUser.objects.get(username=username)
+        except MontageUser.DoesNotExist as e:
+            logger.error(e)
+            return None
+
         is_successed = delete_auth0_user(target.identifier_id)
 
         if is_successed:
@@ -234,7 +240,14 @@ class Query(graphene.ObjectType):
         UsersUnansweredQuestionsType)
 
     def resolve_user(self, info, username):
-        return MontageUser.objects.get(username=username)
+
+        try:
+            user = MontageUser.objects.get(username=username)
+        except MontageUser.DoesNotExist as e:
+            logger.error(e)
+            return None
+
+        return user
 
     def resolve_users(self, info):
         return MontageUser.objects.all()

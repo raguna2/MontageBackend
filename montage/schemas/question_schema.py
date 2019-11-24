@@ -43,7 +43,12 @@ class CreateQuestionMutation(graphene.Mutation):
 
     def mutate(self, info, about):
         user_id = info.context.user.id
-        user = MontageUser.objects.get(id=user_id)
+        try:
+            user = MontageUser.objects.get(id=user_id)
+        except MontageUser.DoesNotExist as e:
+            logger.error(e)
+            return None
+
         # ユーザが作成したものは自動的にmy_questionカテゴリになる
         category = Category.objects.get(name='my_question')
         # ユーザが質問を作る用のMutationなのでis_personalはデフォルト値
