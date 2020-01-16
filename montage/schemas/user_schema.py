@@ -15,6 +15,7 @@ from portraits.models.questions import Question
 
 MGT_CLIENT_ID = os.environ.get('MGT_CLIENT_ID')
 MGT_CLIENT_ID_SECRET = os.environ.get('MGT_CLIENT_ID_SECRET')
+AUTH0_DOMAIN = os.environ.get('AUTH0_DOMAIN')
 logger = logging.getLogger(__name__)
 
 
@@ -216,6 +217,7 @@ class DeleteMontageUserMutation(graphene.Mutation):
             logger.info('Djangoデータベースからユーザは削除されました')
         else:
             ok = False
+            logger.warning('ユーザ削除に失敗しました.')
         return DeleteMontageUserMutation(ok=ok)
 
 
@@ -284,11 +286,11 @@ def delete_auth0_user(identifier_id: str) -> bool:
     """
 
     # fetch access token for management API
-    conn = http.client.HTTPSConnection("montage.auth0.com")
+    conn = http.client.HTTPSConnection(AUTH0_DOMAIN)
     payload = {
         "client_id": MGT_CLIENT_ID,
         "client_secret": MGT_CLIENT_ID_SECRET,
-        "audience": "https://montage.auth0.com/api/v2/",
+        "audience": f"https://{AUTH0_DOMAIN}/api/v2/",
         "grant_type": "client_credentials",
     }
     logger.info('fetch access token for management API')
