@@ -286,6 +286,7 @@ def delete_auth0_user(identifier_id: str) -> bool:
     """
 
     # fetch access token for management API
+    logger.info('Start to fetch access token for management API')
     conn = http.client.HTTPSConnection(AUTH0_DOMAIN)
     payload = {
         "client_id": MGT_CLIENT_ID,
@@ -293,23 +294,24 @@ def delete_auth0_user(identifier_id: str) -> bool:
         "audience": f"https://{AUTH0_DOMAIN}/api/v2/",
         "grant_type": "client_credentials",
     }
-    logger.info('fetch access token for management API')
     conn.request(
         "POST",
         "/oauth/token",
         json.dumps(payload),
         {'content-type': "application/json"}
     )
-    logger.info('success fetch access token for management API')
 
-    data = json.loads(conn.getresponse().read().decode("utf-8"))
+    management_response = conn.getresponse().read().decode("utf-8")
+    data = json.loads(management_response)
+    logger.debug('data = %s', data)
     if 'access_token' not in data.keys():
         logger.error("fail to fetch access token")
         return False
 
-    manage_access_token = data['access_token']
+    logger.info('success fetch access token for management API')
 
     # access management API and delete Auth0 User
+    manage_access_token = data['access_token']
     apiheaders = {'authorization': f"Bearer {manage_access_token}"}
 
     logger.info('delete auth0 user with management API')
