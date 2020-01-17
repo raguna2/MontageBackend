@@ -1,16 +1,16 @@
-import os
 import json
 import logging
+import os
 
 from django.core.cache import cache
 from django.utils import timezone
 
 import requests
 from jose import jwk, jwt
-from jose.utils import base64url_decode
 from jose.backends.rsa_backend import RSAKey
+from jose.utils import base64url_decode
 
-AUTH0_DOMAIN = "montage.auth0.com"
+AUTH0_DOMAIN = os.environ.get('AUTH0_DOMAIN')
 API_IDENTIFIER = os.environ.get('AUTH0_API_IDENTIFIER')
 ALGORITHMS = ["RS256"]
 
