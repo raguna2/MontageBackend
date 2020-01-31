@@ -2,6 +2,7 @@ import logging
 
 import graphene
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Prefetch
 from graphene_django import DjangoObjectType
 
 from accounts.models import MontageUser
@@ -89,24 +90,55 @@ class Query(graphene.ObjectType):
     category_questions = graphene.List(
         FilteredQuestionType,
         user_id=graphene.Int(),
-        category_name=graphene.String(),
+        category_id=graphene.Int(),
         page=graphene.Int(),
         size=graphene.Int(),
     )
     questions = graphene.List(FilteredQuestionType)
 
-    def resolve_category_questions(self, info, user_id, category_name, page, size):
+    def resolve_category_questions(
+            self, info, user_id, category_id, page, size):
         """ユーザのカテゴリごとの質問(未回答のみ)
+
+        Parameters
+        -----------------
+        info: Any
+            リクエスト
+
+        user_id: int
+            質問を取得するユーザID
+
+        category_id: int
+            取得するカテゴリのID
+
+        page: int
+            取得開始位置
+
+        size: int
+            取得件数
 
         Notes
         -----------------
-        入出力値についてはsnapshotを参照
+        回答のあるImpressionのIDをrev_impressionにもたないQuestionが未回答質問
 
         """
+        # 既に回答のあるもののIDリストを作成
+        ids = Impression.objects.filter(
+            user__pk=user_id
+        ).values_list('id', flat=True)
+
+        # ユーザに紐づく未回答質問のみを抽出
         category_questions = Question.objects.filter(
-            user__pk=user_id,
-            category__name=category_name,
-            rev_impression__isnull=True,
+            category__id=category_id,
+        ).exclude(
+            rev_impression__id__in=ids,
+        ).select_related(
+            'category'
+        ).prefetch_related(
+            Prefetch(
+                'rev_impression',
+                queryset=Impression.objects.filter(user__pk=user_id)
+            )
         )
 
         start = page * size if page > 0 else 0
