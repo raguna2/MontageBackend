@@ -103,10 +103,15 @@ class Mutation(graphene.ObjectType):
 
 class Query(graphene.ObjectType):
     # 任意の質問に対する回答の一覧
-    impression = graphene.Field(ImpressionType, question=graphene.String())
+    impression = graphene.Field(ImpressionType,
+                                question=graphene.String(),
+                                imp_id=graphene.Int())
 
     # すべての回答
     impressions = graphene.List(ImpressionType)
+
+    # 指定された回答以外のすべての回答
+    impressions_without = graphene.List(ImpressionType, without_id=graphene.Int(required=True))
 
     # ユーザ毎の回答済み一覧
     user_impressions = graphene.List(
@@ -116,11 +121,18 @@ class Query(graphene.ObjectType):
         size=graphene.Int(),
     )
 
-    def resolve_impression(self, info, question):
-        return Impression.objects.get(question=question)
+    def resolve_impression(self, info, question=None, imp_id=None):
+        if imp_id:
+            return Impression.objects.get(id=imp_id)
+        if question:
+            return Impression.objects.get(question=question)
+        return None
 
     def resolve_impressions(self, info):
         return Impression.objects.all()
+
+    def resolve_impressions_without(self, info, without_id):
+        return Impression.objects.exclude(id=without_id).all()
 
     def resolve_user_impressions(self, info, username, page, size):
         """ユーザ毎の回答済みimpressionsを取得するときのクエリ結果
