@@ -132,7 +132,12 @@ class Query(graphene.ObjectType):
         return Impression.objects.all()
 
     def resolve_impressions_without(self, info, without_id):
-        return Impression.objects.exclude(id=without_id).all()
+        imp = Impression.objects.filter(id=without_id).last()
+        imps = Impression.objects.filter(question_id=imp.question.id).exclude(id=without_id)
+        if imps:
+            return imps
+        else:
+            return []
 
     def resolve_user_impressions(self, info, username, page, size):
         """ユーザ毎の回答済みimpressionsを取得するときのクエリ結果
