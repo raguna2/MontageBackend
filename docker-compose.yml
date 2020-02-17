@@ -3,18 +3,46 @@ services:
     postgres:
       container_name: montage_db
       image: postgres:10.5
-      env_file: .env
+      environment:
+        DATABASE_NAME:
+        DATABASE_USER:
+        DATABASE_PASSWORD:
       ports:
         - "5432:5432"
       volumes:
-        - "postgres:/var/lib/postgresql/montage/data"
+        - db-volume:/var/lib/postgres
     web:
         build: .
         container_name: montage_web
-        env_file: .env
-        command: python manage.py runserver 0.0.0.0:8000 --settings=montage.settings.dev
+        environment:
+          SECRET_KEY:
+          DATABASE_NAME:
+          DATABASE_USER:
+          DATABASE_PASSWORD:
+          DJANGO_DEBUG:
+          DJANGO_LOG_LEVEL:
+          PYTHONDEVREQUIRES:
+          SOCIAL_AUTH_TWITTER_KEY:
+          SOCIAL_AUTH_TWITTER_SECRET:
+          MONTAGE_GUNICORN_WORKER:
+          DJANGO_SETTINGS_MODULE:
+          CLOUDINARY_UPLOAD_FOLDER:
+          CLOUDINARY_CLOUD_NAME:
+          CLOUDINARY_API_KEY:
+          CLOUDINARY_API_SECRET:
+          MGT_CLIENT_ID:
+          MGT_CLIENT_ID_SECRET:
+          AUTH0_API_IDENTIFIER:
+          AUTH0_DOMAIN:
+        command:
+          - "python"
+          - "manage.py"
+          - "runserver"
+          - "0.0.0.0:8000"
         volumes:
-            - .:/app
+          - toxdir:/var/www/montage/.tox
+          - toxdir:/var/www/montage/.pytest_cache
+          - .:/var/www/montage
         ports:
             - "8000:8000"
         depends_on:
@@ -32,3 +60,7 @@ services:
         - web
 volumes:
   postgres:
+
+volumes:
+  db-volume:
+  toxdir:

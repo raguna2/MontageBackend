@@ -1,7 +1,7 @@
+from apps.accounts.models import MontageUser
+from apps.portraits.models import Question
 from django.core.management.base import BaseCommand
 from django.utils import timezone
-from portraits.models.questions import Question
-from accounts.models import MontageUser
 
 
 class Command(BaseCommand):

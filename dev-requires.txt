@@ -1,9 +1,0 @@
--r requirements.txt
-pluggy==0.11.0
-pytest==4.5.0
-pytest-cov==2.6.0
-pytest-django==3.4.8
-pytest-pythonpath==0.7.3
-tox==3.3.0
-snapshottest==0.5.0
-factory-boy==2.12.0

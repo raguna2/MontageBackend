@@ -1,6 +1,6 @@
 from django.contrib import admin
-from .models.questions import Question
-from .models.impressions import Impression
+
+from .models import Impression, Question
 
 
 class QuestionInline(admin.TabularInline):

@@ -1,5 +1,6 @@
 from django.contrib import admin
-from accounts.models import MontageUser
+
+from .models import MontageUser
 
 
 class MontageUserAdmin(admin.ModelAdmin):

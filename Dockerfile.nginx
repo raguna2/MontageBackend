@@ -1,0 +1,7 @@
+# vim: ft=dockerfile ts=2 sw=2 et
+
+FROM nginx:stable-alpine
+
+ARG TZ="Asia/Tokyo"
+COPY ./deployment/nginx_default.conf /etc/nginx/conf.d/default.conf
+ENV TZ=${TZ}
