@@ -117,7 +117,7 @@ class UserSearchType(DjangoObjectType):
             'username': ["icontains", "startswith"],
         }
         interfaces = (graphene.Node, )
-        exclude_fields = ('password')
+        exclude_fields = ('password', )
 
 
 class UsersUnansweredQuestionsType(DjangoObjectType):

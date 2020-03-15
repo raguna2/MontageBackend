@@ -42,11 +42,11 @@ class CreateImpressionMutation(graphene.Mutation):
 
         try:
             user = MontageUser.objects.get(username=username)
-        except ObjectDoesNotExist as e:
-            logger.error('hoge')
-            logger.error(e)
+        except ObjectDoesNotExist:
+            logger.exception('Montage User does not exists.')
             ok = False
 
+        logger.debug('start to get target question.')
         question = Question.objects.get(id=question_id, user=user)
 
         impression = Impression.objects.create(
