@@ -1,5 +1,5 @@
+from django.conf import settings
 from django.db import models
-from montage.settings.common import AUTH_USER_MODEL
 
 
 class Friendship(models.Model):
@@ -15,13 +15,13 @@ class Friendship(models.Model):
         関係づけられた人
     """
     relate_from = models.ForeignKey(
-        AUTH_USER_MODEL,
+        settings.AUTH_USER_MODEL,
         related_name='friendship_from',
         on_delete=models.CASCADE
     )
 
     relate_to = models.ForeignKey(
-        AUTH_USER_MODEL,
+        settings.AUTH_USER_MODEL,
         related_name='friendship_to',
         on_delete=models.CASCADE
     )

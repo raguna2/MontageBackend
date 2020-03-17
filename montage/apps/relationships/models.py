@@ -1,6 +1,5 @@
+from django.conf import settings
 from django.db import models
-
-from montage.settings.common import AUTH_USER_MODEL
 
 
 class Relationship(models.Model):
@@ -14,13 +13,13 @@ class Relationship(models.Model):
         フォローされた人
     """
     following = models.ForeignKey(
-        AUTH_USER_MODEL,
+        settings.AUTH_USER_MODEL,
         related_name='follows',
         on_delete=models.CASCADE
     )
 
     followed = models.ForeignKey(
-        AUTH_USER_MODEL,
+        settings.AUTH_USER_MODEL,
         related_name='followers',
         on_delete=models.CASCADE
     )

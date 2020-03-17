@@ -3,14 +3,17 @@ import logging
 import os
 from pathlib import Path
 
-from django.contrib.auth.models import (AbstractBaseUser, BaseUserManager,
-                                        PermissionsMixin)
+from apps.portraits.models import Question
+import cloudinary
+from django.contrib.auth.models import (
+    AbstractBaseUser,
+    BaseUserManager,
+    PermissionsMixin
+)
 from django.core import validators
 from django.db import models
-
-import cloudinary
 import requests
-from portraits.models.questions import Question
+
 
 USERNAME_VALID_TEXT = 'ユーザー名には半角英数、アンダースコアだけ使えます'
 USERNAME_VALIDATOR = validators.RegexValidator(r'^[a-zA-Z0-9_]+$', USERNAME_VALID_TEXT)
@@ -140,7 +143,7 @@ class MontageUserManager(BaseUserManager):
 class MontageUser(AbstractBaseUser, PermissionsMixin):
     objects = MontageUserManager()
     USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS =['identifier_id']
+    REQUIRED_FIELDS = ['identifier_id']
     # 下記に記載したものがcreatesuperuser実行時に聞かれる
     username = models.CharField(
         'ユーザ名',

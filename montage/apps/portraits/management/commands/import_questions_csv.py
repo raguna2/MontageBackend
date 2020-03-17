@@ -1,11 +1,10 @@
 import csv
-from pathlib import Path
 from dataclasses import dataclass
+from pathlib import Path
 
+from apps.portraits.models import Question
 from django.core.management.base import BaseCommand
 from django.utils import timezone
-from portraits.models.questions import Question
-from accounts.models import MontageUser
 
 here = Path(__file__).parents[2]
 INPUT_CSV_DIR = here / 'sample_csv'
@@ -37,7 +36,10 @@ class Command(BaseCommand):
                 if not row:
                     continue
                 try:
-                    target = InsertQuestion(about=row[0], category_id=int(row[1]))
+                    target = InsertQuestion(
+                        about=row[0],
+                        categoryId=int(row[1]),
+                    )
                 except ValueError as e:
                     print('不正な値が入っています')
                     print(e)
