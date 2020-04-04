@@ -106,9 +106,10 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ["DATABASE_NAME"],
-        'USER': os.environ["DATABASE_USER"],
-        'HOST': 'postgres',
+        'NAME': os.environ.get('DB_DATABASE'),
+        'USER': os.environ.get('DB_USERNAME'),
+        'HOST': os.environ.get('DB_HOST', 'postgres'),
+        'PASSWORD': os.environ.get('DB_PASSWORD', 'password'),
         'PORT': 5432,
     }
 }
