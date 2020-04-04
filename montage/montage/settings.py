@@ -198,7 +198,10 @@ MGT_CLIENT_ID_SECRET = os.environ.get('MGT_CLIENT_ID_SECRET')
 
 if not DEBUG:
     # ALLOWED_HOSTSにherokuのURLを書く
-    ALLOWED_HOSTS = ['https://montage.bio']
+    ALLOWED_HOSTS = [
+        'https://montage.bio',
+        os.environ.get('DJANGO_DEBUG_HOST', 'http://montage.bio')
+    ]
 
     django_heroku.settings(locals())
 
