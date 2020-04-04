@@ -241,16 +241,18 @@ class Query(graphene.ObjectType):
 
     def resolve_user(self, info, username):
 
-        try:
-            user = MontageUser.objects.get(username=username)
-        except MontageUser.DoesNotExist as e:
-            logger.error(e)
+        user = MontageUser.objects.filter(
+            username=username,
+            is_superuser=False,
+        ).first()
+        if not user:
+            logger.error('User does not exist | username = %s', username)
             return None
 
         return user
 
     def resolve_users(self, info):
-        return MontageUser.objects.all()
+        return MontageUser.objects.filter(is_superuser=False).all()
 
 
 def delete_auth0_user(identifier_id: str) -> bool:
