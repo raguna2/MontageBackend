@@ -18,7 +18,4 @@ def main():
 
 
 if __name__ == '__main__':
-    # sys.path.append('/var/www/montage/montage/apps/accounts/')
-    print(sys.path)
-    print(os.environ)
     main()
