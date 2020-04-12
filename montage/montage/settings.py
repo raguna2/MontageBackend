@@ -6,7 +6,7 @@ import django_heroku
 
 # 開発環境のホスト名をhostnameに入力し、
 # see: https://mmmmemo.com/20180615_python_django_02/
-DEBUG = os.environ.get('DJANGO_DEBUG', 'True')
+DEBUG = os.environ.get('DJANGO_DEBUG', True)
 SECRET_KEY = os.environ['SECRET_KEY']
 
 AUTH_USER_MODEL = 'accounts.MontageUser'
@@ -195,7 +195,6 @@ ALGORITHMS = ["RS256"]
 MGT_CLIENT_ID = os.environ.get('MGT_CLIENT_ID')
 MGT_CLIENT_ID_SECRET = os.environ.get('MGT_CLIENT_ID_SECRET')
 
-
 if not DEBUG:
     # ALLOWED_HOSTSにherokuのURLを書く
     ALLOWED_HOSTS = [
@@ -208,8 +207,8 @@ if not DEBUG:
     # httpを強制的にhttpsでリダイレクトしてくれる(production用)
     SECURE_SSL_REDIRECT = False
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
     # セッションクッキーと CSRF クッキーにセキュリティを適用する
-    # see:
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
 

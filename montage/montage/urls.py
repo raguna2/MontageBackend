@@ -8,7 +8,6 @@ from graphene_django.views import GraphQLView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    # namespace for django 2.1 see: https://mocabrown.com/blog/archives/5346
     path('', include(('apps.accounts.urls', 'accounts'), )),
     path('gql/', csrf_exempt(GraphQLView.as_view(graphiql=True))),
 ]

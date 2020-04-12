@@ -29,36 +29,6 @@ class CategoryType(DjangoObjectType):
         model = Category
 
 
-class CategoryNode(DjangoObjectType):
-    """CategoryNode."""
-    class Meta:
-        """Meta."""
-        model = Category
-        interfaces = (graphene.relay.Node, )
-
-
-class CreateCategoryRelay(graphene.relay.ClientIDMutation):
-    category = graphene.Field(CategoryNode)
-    ok = graphene.Boolean()
-
-    class Input:
-        name = graphene.String()
-        description = graphene.String()
-
-    def mutate_and_get_payload(self, info, **input):
-        ok = True
-
-        try:
-            cat = Category.objects.create(
-                name=input.get('name'), description=input.get('description'))
-            cat.save()
-        except ObjectDoesNotExist as e:
-            logger.error(e)
-            ok = False
-
-        return CreateCategoryRelay(category=cat, ok=ok)
-
-
 class CreateCategoryMutation(DjangoModelFormMutation):
     """
     カテゴリの作成
@@ -131,7 +101,6 @@ class DeleteCategoryMutation(graphene.Mutation):
 
 class Mutation(graphene.ObjectType):
     create_category = CreateCategoryMutation.Field()
-    create_category_relay = CreateCategoryRelay.Field()
     update_category = UpdateCategoryMutation.Field()
     delete_category = DeleteCategoryMutation.Field()
 

@@ -187,3 +187,9 @@ class MontageUser(AbstractBaseUser, PermissionsMixin):
 
     def save(self, *args, **kwargs):
         super(MontageUser, self).save(*args, **kwargs)
+
+    @property
+    def as_atsign(self):
+        """@{username}として表示"""
+        username = self.username
+        return f'@{username}'

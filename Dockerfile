@@ -40,21 +40,20 @@ VOLUME ${APPDIR}/.tox
 
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONPATH=${APPDIR}/montage
+ENV PYTHONUNBUFFERED 1
+
 ENV LANG=${LOCALE}
 ENV TZ=${TZ}
+
+# heroku上では環境変数でPORTを設定しないと疎通できない.EXPOSEは設定しても意味がない.
+ENV PORT=8000
+ENV MONTAGE_GUNICORN_WORKERS=2
 
 WORKDIR ${APPDIR}/montage/
 
 EXPOSE 8000
-CMD [ \
-  "gunicorn", \
-  "-w",                     "2", \
-  "-b",                     "127.0.0.1:8000", \
-  "--max-requests",         "47", \
-  "--max-requests-jitter",  "5", \
-  "--timeout",              "3600", \
-  "--access-logfile",       "-", \
-  "--error-logfile",        "-", \
-  "--capture-output", \
-  "montage.wsgi" \
-]
+CMD gunicorn -w $MONTAGE_GUNICORN_WORKERS\
+    --log-level INFO\
+    -b 0.0.0.0:$PORT\
+    -e DJANGO_SETTINGS_MODULE=montage.settings\
+    montage.wsgi:application
