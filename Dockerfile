@@ -53,7 +53,12 @@ WORKDIR ${APPDIR}/montage/
 
 EXPOSE 8000
 CMD gunicorn -w $MONTAGE_GUNICORN_WORKERS\
-    --log-level INFO\
+    --log-level DEBUG\
+    --max-requests 47\
+    --max-requests-jitter 5\
+    --timeout 3600\
+    --access-logfile "-"\
+    --error-logfile "-"\
+    --capture-output\
     -b 0.0.0.0:$PORT\
-    -e DJANGO_SETTINGS_MODULE=montage.settings\
     montage.wsgi:application
