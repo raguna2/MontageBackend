@@ -38,7 +38,7 @@ class Command(BaseCommand):
                 try:
                     target = InsertQuestion(
                         about=row[0],
-                        categoryId=int(row[1]),
+                        category_id=int(row[1]),
                     )
                 except ValueError as e:
                     print('不正な値が入っています')
