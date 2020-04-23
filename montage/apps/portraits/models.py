@@ -99,6 +99,12 @@ class Impression(models.Model):
         '変更されているか',
         help_text='collageされた場合画面には表示させないためにTrueにする',
         default=False)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        blank=True,
+        null=True,
+        default=None,
+        on_delete=models.SET_NULL)
 
     def __str__(self):
         """Printしたときはcontentを返す"""
