@@ -168,21 +168,37 @@ class CreateAuth0User(graphene.Mutation):
             display_name = payload['name']
             username = payload['https://montage.bio/screen_name']
             picture = payload['picture']
-            user = None
-
-            if identifier_id and username and display_name:
-                user = user_model.objects.create_user(
-                    username=username,
-                    identifier_id=identifier_id,
-                    display_name=display_name,
-                    profile_img_url=picture,
-                )
-                logger.info('created user object')
+            logger.debug(
+                'payload data | %s %s %s %s',
+                identifier_id,
+                display_name,
+                username,
+                picture
+            )
         else:
             logger.error('検証に失敗')
-            user = None
+            return CreateAuth0User(user=None)
 
-        return CreateAuth0User(user=user)
+        fetched_user = user_model.objects.filter(username=username).first()
+        if fetched_user:
+            logger.error('user already exist')
+            return CreateAuth0User(user=None)
+
+        # ユーザは存在していないことが確定
+        if identifier_id and username and display_name:
+            # 値が存在していれば作成
+
+            user = user_model.objects.create_user(
+                username=username,
+                identifier_id=identifier_id,
+                display_name=display_name,
+                profile_img_url=picture,
+            )
+            logger.info('created user object')
+            return CreateAuth0User(user=user)
+
+        logger.info('identifier_id or username or display_name are not found')
+        return CreateAuth0User(user=None)
 
 
 class DeleteMontageUserMutation(graphene.Mutation):
