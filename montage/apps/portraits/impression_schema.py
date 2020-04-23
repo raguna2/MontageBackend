@@ -144,14 +144,16 @@ class Query(graphene.ObjectType):
             logger.error(e)
             return None
 
-        # 回答がすでにあるquestionを取得
-        impressed_q = Question.objects.filter(
-            rev_impression__user=user,
-            rev_impression__isnull=False
-        ).distinct()
+        impressed_q = Impression.objects.filter(
+            user=user,
+        ).order_by('-posted_at')
 
-        # 回答がすでにある質問ごとに最新のimpressionを取得
-        all_imp = [q.rev_impression.latest('posted_at') for q in impressed_q]
+        all_imp = []
+        question_ids = []
+        for q in impressed_q:
+            if q.question.id not in question_ids:
+                all_imp.append(q)
+                question_ids.append(q.question.id)
 
         # ページ番号と取得数を指定し、その数にあった分のimpressionを返す
         start = page * size if page > 0 else 0
