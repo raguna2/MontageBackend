@@ -233,6 +233,10 @@ class Query(graphene.ObjectType):
         picture=graphene.String(),
     )
     users = graphene.List(UserType)
+    recommend_users = graphene.List(
+        UserType,
+        username=graphene.String(),
+    )
     # ユーザ名での検索用
     searched_users = DjangoFilterConnectionField(UserSearchType)
     # 未回答質問取得用
@@ -253,6 +257,15 @@ class Query(graphene.ObjectType):
 
     def resolve_users(self, info):
         return MontageUser.objects.filter(is_superuser=False).all()
+
+    def resolve_recommend_users(self, info, username):
+        """自分以外のユーザをランダムに6件取得する"""
+        logger.debug('username = %s', username)
+        return MontageUser.objects.filter(
+            is_superuser=False
+        ).exclude(
+            username=username,
+        ).order_by('?')[:6]
 
 
 def delete_auth0_user(identifier_id: str) -> bool:
