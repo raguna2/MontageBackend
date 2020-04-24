@@ -36,8 +36,9 @@ class CreateImpressionMutation(graphene.Mutation):
         question_id = graphene.Int(required=True)
         username = graphene.String(required=True)
         content = graphene.String(required=True)
+        auth_username = graphene.String(required=True)
 
-    def mutate(self, info, question_id, username, content):
+    def mutate(self, info, question_id, username, content, auth_username):
         ok = True
 
         try:
@@ -49,8 +50,18 @@ class CreateImpressionMutation(graphene.Mutation):
         logger.debug('start to get target question.')
         question = Question.objects.get(id=question_id, user=user)
 
+        try:
+            creater = MontageUser.objects.get(username=auth_username)
+        except ObjectDoesNotExist:
+            logger.exception('Montage User of creating impression does not exists.')
+            creater = None
+
         impression = Impression.objects.create(
-            user=user, question=question, content=content)
+            user=user,
+            question=question,
+            content=content,
+            created_by=creater,
+        )
         impression.save()
         return CreateImpressionMutation(impression=impression, ok=ok)
 

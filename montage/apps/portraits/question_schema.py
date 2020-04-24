@@ -42,6 +42,7 @@ class AnswerType(graphene.ObjectType):
     impression_id = graphene.Int()
     user_id = graphene.Int()
     answer = graphene.String()
+    created_by_id = graphene.Int()
     is_target = graphene.Boolean()
 
 
@@ -223,6 +224,7 @@ class Query(graphene.ObjectType):
             impression_id=F('rev_impression__id'),
             user_id=F('rev_impression__user'),
             answer=F('rev_impression__content'),
+            created_by_id=F('rev_impression__created_by'),
         ).filter(
             user_id=target_user_id,
             rev_impression__id=target_impression_id
@@ -245,6 +247,7 @@ class Query(graphene.ObjectType):
                 impression_id=item['impression_id'],
                 user_id=item['user_id'],
                 answer=item['answer'],
+                created_by_id=item['created_by_id'],
                 is_target=is_target,
             )
             if is_target:
