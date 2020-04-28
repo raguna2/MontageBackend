@@ -1,10 +1,13 @@
+import datetime
 import logging
+from typing import Any, Dict, List, Optional
 
 from apps.accounts.models import MontageUser
 from apps.portraits.models import Impression, Question
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator
 import graphene
+from graphql import GraphQLError
 from graphene_django import DjangoObjectType
 from graphene_django.filter import DjangoFilterConnectionField
 
@@ -18,6 +21,21 @@ class ImpressionType(DjangoObjectType):
     class Meta:
         """Meta."""
         model = Impression
+
+
+class UserAnswersType(graphene.ObjectType):
+    """あるユーザの質問に紐づく回答のType"""
+    id = graphene.Int()
+    content = graphene.String()
+    createrUserName = graphene.String()
+    posted_at = graphene.String()
+
+
+class QuestionAndAnswersType(graphene.ObjectType):
+    """あるユーザに紐づく質問とその質問に紐づく回答の一覧を表すType"""
+    id = graphene.Int()
+    about = graphene.String()
+    items = graphene.List(UserAnswersType)
 
 
 class CreateImpressionMutation(graphene.Mutation):
@@ -36,21 +54,32 @@ class CreateImpressionMutation(graphene.Mutation):
         question_id = graphene.Int(required=True)
         username = graphene.String(required=True)
         content = graphene.String(required=True)
+        auth_username = graphene.String(required=True)
 
-    def mutate(self, info, question_id, username, content):
+    def mutate(self, info, question_id, username, content, auth_username):
         ok = True
 
         try:
             user = MontageUser.objects.get(username=username)
         except ObjectDoesNotExist:
             logger.exception('Montage User does not exists.')
-            ok = False
+            raise GraphQLError('target User does not exists. username = %s', username)
 
         logger.debug('start to get target question.')
-        question = Question.objects.get(id=question_id, user=user)
+        question = Question.objects.get(id=question_id)
+
+        try:
+            creater = MontageUser.objects.get(username=auth_username)
+        except ObjectDoesNotExist:
+            logger.exception('Montage User of creating impression does not exists.')
+            raise GraphQLError('creater User does not exists. username = %s', username)
 
         impression = Impression.objects.create(
-            user=user, question=question, content=content)
+            user=user,
+            question=question,
+            content=content,
+            created_by=creater,
+        )
         impression.save()
         return CreateImpressionMutation(impression=impression, ok=ok)
 
@@ -80,17 +109,17 @@ class DeleteImpressionMutation(graphene.Mutation):
     ok = graphene.Boolean()
 
     class Arguments:
-        id = graphene.Int()
+        delete_impression_id = graphene.Int()
 
-    def mutate(self, info, id):
+    def mutate(self, info, delete_impression_id):
         try:
-            Impression.objects.filter(id=id).delete()
+            Impression.objects.filter(id=delete_impression_id).delete()
             ok = True
         except ObjectDoesNotExist as e:
             logger.error(e)
             ok = False
 
-        return DeleteImpressionMutation(id=id, ok=ok)
+        return DeleteImpressionMutation(ok=ok)
 
 
 class Mutation(graphene.ObjectType):
@@ -105,9 +134,9 @@ class Query(graphene.ObjectType):
     # すべての回答
     impressions = graphene.List(ImpressionType)
 
-    # ユーザ毎の回答済み一覧
+    # プロフィールに表示する最新の質問と回答一覧(回答は質問に紐づくすべての回答)
     user_impressions = graphene.List(
-        ImpressionType,
+        QuestionAndAnswersType,
         username=graphene.String(),
         page=graphene.Int(),
         size=graphene.Int(),
@@ -138,24 +167,50 @@ class Query(graphene.ObjectType):
         クエリと取得結果はsnapshotテストを参照
 
         """
-        try:
-            user = MontageUser.objects.get(username=username)
-        except MontageUser.DoesNotExist as e:
-            logger.error(e)
-            return None
+        user_exists = MontageUser.objects.filter(username=username).exists()
 
-        impressed_q = Impression.objects.filter(
-            user=user,
+        if not user_exists:
+            logger.info('user does not exists')
+            raise GraphQLError('User does not exists. username = %s', username)
+
+        impressed_q = Impression.objects.select_related(
+            'question'
+        ).filter(
+            user__username=username
         ).order_by('-posted_at')
+        if not impressed_q:
+            logger.debug('回答済みの質問はありませんでした')
+            return []
 
-        all_imp = []
-        question_ids = []
-        for q in impressed_q:
-            if q.question.id not in question_ids:
-                all_imp.append(q)
-                question_ids.append(q.question.id)
+        impressed_q_ids = list(set([i.question.id for i in impressed_q]))
 
         # ページ番号と取得数を指定し、その数にあった分のimpressionを返す
         start = page * size if page > 0 else 0
         end = size + page * size if page > 0 else size
-        return all_imp[start:end]
+
+        result = []
+        # 回答のある質問一覧
+        questions = Question.objects.filter(
+            user__username=username,
+            id__in=impressed_q_ids,
+        )[start:end]
+
+        for q in questions:
+            # 質問毎の回答一覧をリストとして内包表記で生成
+            items = [
+                UserAnswersType(
+                    id=i.id,
+                    content=i.content,
+                    createrUserName=i.created_by.username,
+                    posted_at=i.posted_at
+                )
+                for i in impressed_q if i.question.id == q.id
+            ]
+            qa = QuestionAndAnswersType(
+                id=q.id,
+                about=q.about,
+                items=items,
+            )
+            result.append(qa)
+
+        return result

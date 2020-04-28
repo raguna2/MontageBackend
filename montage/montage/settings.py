@@ -10,7 +10,12 @@ DEBUG = os.environ.get('DJANGO_DEBUG', True)
 SECRET_KEY = os.environ['SECRET_KEY']
 
 AUTH_USER_MODEL = 'accounts.MontageUser'
-GRAPHENE = {'SCHEMA': 'montage.schema.schema'}
+GRAPHENE = {
+    'SCHEMA': 'montage.schema.schema',
+    'MIDDLEWARE': [
+        'graphene_django.debug.DjangoDebugMiddleware',
+    ]
+}
 ALLOWED_HOSTS = ['*']
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ORIGIN_WHITELIST = (
