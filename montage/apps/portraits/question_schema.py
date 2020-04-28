@@ -1,6 +1,5 @@
-import datetime
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 from apps.accounts.models import MontageUser
 from apps.accounts.schemas import UserType
@@ -42,7 +41,7 @@ class AnswerType(graphene.ObjectType):
     impression_id = graphene.Int()
     user_id = graphene.Int()
     answer = graphene.String()
-    created_by_id = graphene.Int()
+    creater_user_name = graphene.String()
     is_target = graphene.Boolean()
 
 
@@ -110,7 +109,7 @@ class Query(graphene.ObjectType):
     questions = graphene.List(FilteredQuestionType)
     answers_for_individual_page = graphene.List(
         AnswerType,
-        target_user_id=graphene.Int(),
+        target_user_name=graphene.String(),
         target_impression_id=graphene.Int(),
     )
 
@@ -140,17 +139,9 @@ class Query(graphene.ObjectType):
         回答のあるImpressionのIDをrev_impressionにもたないQuestionが未回答質問
 
         """
-        # 既に回答のあるもののIDリストを作成
-        ids = Impression.objects.filter(
-            user__pk=user_id
-        ).values_list('id', flat=True)
-
         # ユーザに紐づく未回答質問のみを抽出
-        # TODO: annotateでidsを生成できる
         category_questions = Question.objects.filter(
             category__id=category_id,
-        ).exclude(
-            rev_impression__id__in=ids,
         ).select_related(
             'category'
         ).prefetch_related(
@@ -158,7 +149,7 @@ class Query(graphene.ObjectType):
                 'rev_impression',
                 queryset=Impression.objects.filter(user__pk=user_id)
             )
-        )
+        ).distinct()
 
         start = page * size if page > 0 else 0
         end = size + page * size if page > 0 else size
@@ -168,8 +159,16 @@ class Query(graphene.ObjectType):
         return Question.objects.all()
 
     def resolve_answers_for_individual_page(
-            self, info, target_user_id: int, target_impression_id: int):
+            self, info, target_user_name: str, target_impression_id: int):
         """個別回答ページで用いる質問と回答を取得する
+
+        Parameters
+        ----------------
+        target_user_name: str
+            取得する回答のusername
+
+        target_impression_id: int
+            取得する個別回答のID
 
         Notes
         ----------------------
@@ -179,7 +178,7 @@ class Query(graphene.ObjectType):
         --------------------
         IN
         >>> query{
-              answersForIndividualPage(targetUserId: 2, targetImpressionId: 23){
+              answersForIndividualPage(targetUserName: 2, targetImpressionId: 23){
                 questionId
                 about
                 answer
@@ -217,16 +216,16 @@ class Query(graphene.ObjectType):
         question_with_answers = Question.objects.prefetch_related(
             Prefetch(
                 'rev_impression',
-                queryset=Impression.objects.filter(user_id=target_user_id)
+                queryset=Impression.objects.filter(user__username=target_user_name)
             )
         ).annotate(
             question_id=F('id'),
             impression_id=F('rev_impression__id'),
             user_id=F('rev_impression__user'),
             answer=F('rev_impression__content'),
-            created_by_id=F('rev_impression__created_by'),
+            creater_user_name=F('rev_impression__created_by__username'),
         ).filter(
-            user_id=target_user_id,
+            user__username=target_user_name,
             rev_impression__id=target_impression_id
         ).values()
 
@@ -247,7 +246,7 @@ class Query(graphene.ObjectType):
                 impression_id=item['impression_id'],
                 user_id=item['user_id'],
                 answer=item['answer'],
-                created_by_id=item['created_by_id'],
+                creater_user_name=item['creater_user_name'],
                 is_target=is_target,
             )
             if is_target:
