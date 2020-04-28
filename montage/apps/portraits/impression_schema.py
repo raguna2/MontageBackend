@@ -1,4 +1,6 @@
+import datetime
 import logging
+from typing import Any, Dict, List, Optional
 
 from apps.accounts.models import MontageUser
 from apps.portraits.models import Impression, Question
@@ -61,16 +63,16 @@ class CreateImpressionMutation(graphene.Mutation):
             user = MontageUser.objects.get(username=username)
         except ObjectDoesNotExist:
             logger.exception('Montage User does not exists.')
-            ok = False
+            raise GraphQLError('target User does not exists. username = %s', username)
 
         logger.debug('start to get target question.')
-        question = Question.objects.get(id=question_id, user=user)
+        question = Question.objects.get(id=question_id)
 
         try:
             creater = MontageUser.objects.get(username=auth_username)
         except ObjectDoesNotExist:
             logger.exception('Montage User of creating impression does not exists.')
-            creater = None
+            raise GraphQLError('creater User does not exists. username = %s', username)
 
         impression = Impression.objects.create(
             user=user,
@@ -107,17 +109,17 @@ class DeleteImpressionMutation(graphene.Mutation):
     ok = graphene.Boolean()
 
     class Arguments:
-        id = graphene.Int()
+        delete_impression_id = graphene.Int()
 
-    def mutate(self, info, id):
+    def mutate(self, info, delete_impression_id):
         try:
-            Impression.objects.filter(id=id).delete()
+            Impression.objects.filter(id=delete_impression_id).delete()
             ok = True
         except ObjectDoesNotExist as e:
             logger.error(e)
             ok = False
 
-        return DeleteImpressionMutation(id=id, ok=ok)
+        return DeleteImpressionMutation(ok=ok)
 
 
 class Mutation(graphene.ObjectType):
