@@ -7,6 +7,7 @@ from apps.portraits.impression_schema import Query as impression_query
 from apps.portraits.question_schema import Mutation as question_mute
 from apps.portraits.question_schema import Query as question_query
 import graphene
+from graphene_django.debug import DjangoDebug
 
 
 class Mutation(
@@ -26,7 +27,8 @@ class Query(
         question_query,
         graphene.ObjectType
 ):
-    pass
+    # デバッグでSQL確認する用
+    debug = graphene.Field(DjangoDebug, name='_debug')
 
 
 schema = graphene.Schema(query=Query, mutation=Mutation)
