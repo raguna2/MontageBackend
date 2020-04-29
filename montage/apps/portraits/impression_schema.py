@@ -86,7 +86,7 @@ class CreateImpressionMutation(graphene.Mutation):
             if not uploaded_url:
                 logger.info('failed to upload shared image to cloudinary.')
 
-        impression = Impression(
+        impression = Impression.objects.create(
             user=user,
             question=question,
             content=content,
