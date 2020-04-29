@@ -1,16 +1,13 @@
-import datetime
 import logging
-from typing import Any, Dict, List, Optional
 
 from apps.accounts.models import MontageUser
+from apps.montage_core.utils import upload_base64_img_to_cloudinary
+from apps.portraits.images import create_ogp_share_image
 from apps.portraits.models import Impression, Question
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.paginator import Paginator
 import graphene
-from graphql import GraphQLError
 from graphene_django import DjangoObjectType
-from graphene_django.filter import DjangoFilterConnectionField
-
+from graphql import GraphQLError
 
 logger = logging.getLogger(__name__)
 
@@ -29,6 +26,7 @@ class UserAnswersType(graphene.ObjectType):
     content = graphene.String()
     createrUserName = graphene.String()
     posted_at = graphene.String()
+    impression_img_url = graphene.String()
 
 
 class QuestionAndAnswersType(graphene.ObjectType):
@@ -74,13 +72,29 @@ class CreateImpressionMutation(graphene.Mutation):
             logger.exception('Montage User of creating impression does not exists.')
             raise GraphQLError('creater User does not exists. username = %s', username)
 
+        # OGP用のシェア画像作成&Cloudinaryへのアップロード処理
+        logger.info('start create share image.')
+        uploaded_url = ""
+        share_img_base64 = create_ogp_share_image(user.profile_img_url, question.about, content)
+
+        if not share_img_base64:
+            logger.info('failed to create share image.')
+            raise GraphQLError('failed to create share image. because template is not provided.')
+
+        logger.info('start upload share image to cloudinary.')
+        share_img_uri = f"data:image/png;base64,{share_img_base64}"
+        uploaded_url = upload_base64_img_to_cloudinary(share_img_uri)
+        if not uploaded_url:
+            logger.info('failed to upload shared image to cloudinary.')
+            raise GraphQLError('failed to upload shared image to cloudinary.')
+
         impression = Impression.objects.create(
             user=user,
             question=question,
             content=content,
             created_by=creater,
+            impression_img_url=uploaded_url,
         )
-        impression.save()
         return CreateImpressionMutation(impression=impression, ok=ok)
 
 
@@ -202,7 +216,8 @@ class Query(graphene.ObjectType):
                     id=i.id,
                     content=i.content,
                     createrUserName=i.created_by.username,
-                    posted_at=i.posted_at
+                    posted_at=i.posted_at,
+                    impression_img_url=i.impression_img_url,
                 )
                 for i in impressed_q if i.question.id == q.id
             ]

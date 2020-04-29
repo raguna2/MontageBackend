@@ -22,6 +22,6 @@ class ImpressionInline(admin.StackedInline):
 
 @admin.register(Impression)
 class ImpressionAdmin(admin.ModelAdmin):
-    fields = ['question', 'user', 'content', 'posted_at', 'is_collaged', 'created_by']
-    list_display = ('id', 'question', 'user', 'content', 'posted_at', 'is_collaged', 'created_by')
+    fields = ['question', 'user', 'content', 'posted_at', 'is_collaged', 'created_by', 'impression_img_url']
+    list_display = ('id', 'question', 'user', 'content', 'posted_at', 'is_collaged', 'created_by', 'impression_img_url')
     readonly_fields = ('posted_at',)
