@@ -1,14 +1,13 @@
 import logging
 
 from apps.accounts.models import MontageUser
+from apps.montage_core.utils import upload_base64_img_to_cloudinary
+from apps.portraits.images import create_ogp_share_image
 from apps.portraits.models import Impression, Question
 from django.core.exceptions import ObjectDoesNotExist
 import graphene
 from graphene_django import DjangoObjectType
-
-from apps.montage_core.utils import upload_base64_img_to_cloudinary
 from graphql import GraphQLError
-from apps.portraits.images import create_ogp_share_image
 
 logger = logging.getLogger(__name__)
 
