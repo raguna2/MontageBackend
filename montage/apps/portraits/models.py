@@ -105,6 +105,8 @@ class Impression(models.Model):
         null=True,
         default=None,
         on_delete=models.SET_NULL)
+    impression_img_url = models.URLField(
+        'impression_img_url', help_text='シェア画像のCloudinaryURL', blank=True)
 
     def __str__(self):
         """Printしたときはcontentを返す"""
