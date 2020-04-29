@@ -79,12 +79,14 @@ class CreateImpressionMutation(graphene.Mutation):
 
         if not share_img_base64:
             logger.info('failed to create share image.')
-        else:
-            logger.info('start upload share image to cloudinary.')
-            share_img_uri = f"data:image/png;base64,{share_img_base64}"
-            uploaded_url = upload_base64_img_to_cloudinary(share_img_uri)
-            if not uploaded_url:
-                logger.info('failed to upload shared image to cloudinary.')
+            raise GraphQLError('failed to create share image. because template is not provided.')
+
+        logger.info('start upload share image to cloudinary.')
+        share_img_uri = f"data:image/png;base64,{share_img_base64}"
+        uploaded_url = upload_base64_img_to_cloudinary(share_img_uri)
+        if not uploaded_url:
+            logger.info('failed to upload shared image to cloudinary.')
+            raise GraphQLError('failed to upload shared image to cloudinary.')
 
         impression = Impression.objects.create(
             user=user,

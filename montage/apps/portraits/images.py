@@ -39,7 +39,7 @@ def create_ogp_share_image(profile_img_url: str, question: str, answer: str) -> 
     response = requests.get(profile_img_url)
     if not response.content:
         logger.error("failed to fetch user profile image from cloudinary. %s", profile_img_url)
-        return
+        return None
 
     profile_img = Image.open(BytesIO(response.content))
 
