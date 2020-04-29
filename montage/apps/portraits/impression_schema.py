@@ -27,6 +27,7 @@ class UserAnswersType(graphene.ObjectType):
     content = graphene.String()
     createrUserName = graphene.String()
     posted_at = graphene.String()
+    impression_img_url = graphene.String()
 
 
 class QuestionAndAnswersType(graphene.ObjectType):
@@ -214,7 +215,8 @@ class Query(graphene.ObjectType):
                     id=i.id,
                     content=i.content,
                     createrUserName=i.created_by.username,
-                    posted_at=i.posted_at
+                    posted_at=i.posted_at,
+                    impression_img_url=i.impression_img_url,
                 )
                 for i in impressed_q if i.question.id == q.id
             ]
