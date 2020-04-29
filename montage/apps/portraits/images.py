@@ -32,6 +32,14 @@ def mask_circle_transparent(pil_img: Image, blur_radius: int, offset=0, fill_col
     return result
 
 
+def strip_text(text: str) -> str:
+    if len(text) > 24:
+        fixed_text = text[:24] + '...'
+        return fixed_text
+
+    return text
+
+
 def create_ogp_share_image(profile_img_url: str, question: str, answer: str) -> Optional[str]:
     """OGPシェア用の画像を作成する."""
     # テンプレート画像&プロフィール画像読み込み
@@ -46,8 +54,9 @@ def create_ogp_share_image(profile_img_url: str, question: str, answer: str) -> 
     # 質問と回答を書き込む
     draw = ImageDraw.Draw(img)
     font = ImageFont.truetype(font=FONT_PATH, size=22)
-    draw.text((180, 105), question, (35, 35, 35), font=font)
-    draw.text((200, 240), answer, (35, 35, 35), font=font)
+
+    draw.text((180, 105), strip_text(question), (35, 35, 35), font=font)
+    draw.text((200, 240), strip_text(answer), (35, 35, 35), font=font)
 
     # プロフィール画像をリサイズする
     profile_img = ImageOps.fit(profile_img, (90, 90), Image.ANTIALIAS)
