@@ -229,31 +229,33 @@ class Query(graphene.ObjectType):
             rev_impression__id=target_impression_id
         ).values()
 
+        viewed_user_id = MontageUser.objects.get(username=target_user_name).id
         if not question_with_answers:
             logger.debug("question_with_answers is not found.")
             return []
 
         results: List[Dict[str, Any]] = []
         for item in question_with_answers:
-            is_target = bool(target_impression_id == item['impression_id'])
-            answer = AnswerType(
-                question_id=item['question_id'],
-                about=item['about'],
-                category_id=item['category_id'],
-                appeared_at=item['appeared_at'],
-                updated_at=item['updated_at'],
-                is_personal=item['is_personal'],
-                impression_id=item['impression_id'],
-                user_id=item['user_id'],
-                answer=item['answer'],
-                creater_user_name=item['creater_user_name'],
-                is_target=is_target,
-            )
-            if is_target:
-                # 常にtargetは先頭
-                results.insert(0, answer)
-            else:
-                # それ以外は末尾に追加
-                results.append(answer)
+            if item['user_id'] == viewed_user_id:
+                is_target = bool(target_impression_id == item['impression_id'])
+                answer = AnswerType(
+                    question_id=item['question_id'],
+                    about=item['about'],
+                    category_id=item['category_id'],
+                    appeared_at=item['appeared_at'],
+                    updated_at=item['updated_at'],
+                    is_personal=item['is_personal'],
+                    impression_id=item['impression_id'],
+                    user_id=item['user_id'],
+                    answer=item['answer'],
+                    creater_user_name=item['creater_user_name'],
+                    is_target=is_target,
+                )
+                if is_target:
+                    # 常にtargetは先頭
+                    results.insert(0, answer)
+                else:
+                    # それ以外は末尾に追加
+                    results.append(answer)
 
         return results
