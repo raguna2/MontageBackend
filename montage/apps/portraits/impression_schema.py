@@ -20,6 +20,15 @@ class ImpressionType(DjangoObjectType):
         model = Impression
 
 
+class ImpressionUrlType(DjangoObjectType):
+    """ImpressionのURLのみを取得するType."""
+
+    class Meta:
+        """Meta."""
+        model = Impression
+        fields = ('impression_img_url', )
+
+
 class UserAnswersType(graphene.ObjectType):
     """あるユーザの質問に紐づく回答のType"""
     id = graphene.Int()
@@ -142,8 +151,8 @@ class Mutation(graphene.ObjectType):
 
 
 class Query(graphene.ObjectType):
-    # 任意の質問に対する回答の一覧
-    impression = graphene.Field(ImpressionType, question=graphene.String())
+    # 任意の回答をID指定で取得
+    impression = graphene.Field(ImpressionUrlType, impression_id=graphene.Int())
 
     # すべての回答
     impressions = graphene.List(ImpressionType)
@@ -156,8 +165,10 @@ class Query(graphene.ObjectType):
         size=graphene.Int(),
     )
 
-    def resolve_impression(self, info, question):
-        return Impression.objects.get(question=question)
+    def resolve_impression(self, info, impression_id):
+        return Impression.objects.filter(
+            id=impression_id
+        ).first()
 
     def resolve_impressions(self, info):
         return Impression.objects.all()
