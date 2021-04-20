@@ -9,7 +9,7 @@ graphql-core==2.1
 gunicorn==19.9.0
 promise==2.1
 psycopg2==2.7.5
-py==1.6.0
+py==1.10.0
 pytz==2018.5
 Rx==1.6.1
 singledispatch==3.4.0.3
